@@ -1,0 +1,12 @@
+[Unit]
+Description=Lora Gateway
+
+[Service]
+WorkingDirectory=/opt/loragw/
+ExecStart=/opt/loragw/start.sh
+SyslogIdentifier=loragw
+Restart=on-failure
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target

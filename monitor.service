@@ -1,0 +1,12 @@
+[Unit]
+Description=CH2i monitoring service
+
+[Service]
+WorkingDirectory=/opt/loragw/
+ExecStart=/opt/loragw/monitor.py
+SyslogIdentifier=monitor
+Restart=on-failure
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target
