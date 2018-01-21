@@ -29,8 +29,8 @@ if [[ $GW_RESET_PIN == "" ]]; then
     echo "Please select your reset pin"
     echo "see https://github.com/jpmeijers/ttn-resin-gateway-rpi/blob/master/README.md"
     echo "under section Reset Pin Values"
-    echo "enter 22 (GPIO25) for classic Gonzalo Casas backplane or this RAK831 shield"
-    echo "enter 11 (GPIO17) for classic ic880A by ch2i"
+    echo "enter 25 (GPIO25) for classic Gonzalo Casas backplane or this RAK831 shield"
+    echo "enter 17 (GPIO17) for classic ic880A by ch2i"
     echo ""
     echo -n "Please enter GW_RESET_PIN [$GW_RESET_PIN]:"
     read GW_RESET_PIN
@@ -38,7 +38,7 @@ if [[ $GW_RESET_PIN == "" ]]; then
 fi
 
 # Set the reset în in startup shell
-sed -i -- 's/PIN=22/PIN='"$GW_RESET_PIN"'/g' ./start.sh
+sed -i -- 's/PIN=25/PIN='"$GW_RESET_PIN"'/g' ./start.sh
 
 # script to get config from TTN server
 python set_config.py
