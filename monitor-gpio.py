@@ -1,4 +1,18 @@
 #!/usr/bin/python
+# **********************************************************************************
+# monitor-gpio.py
+# **********************************************************************************
+# Script for monitoring LoraWAN Gateways based on small Linux computers
+# it's lighing some LEDs depending on status and process
+# it's also monitoring a push button to do a clean shutdown
+#
+# Written by Charles-Henri Hallard http://ch2i.eu
+#
+# History : V1.00 2017-12-22 - Creation
+#
+# All text above must be included in any redistribution.
+#
+# **********************************************************************************
 
 import RPi.GPIO as GPIO
 import thread
@@ -23,7 +37,6 @@ localnet = False
 lorawan  = False
 web      = False
 hostapd  = False
-
 
 def signal_handler(signal, frame):
     GPIO.output(gpio_blu, GPIO.LOW)

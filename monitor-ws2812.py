@@ -1,5 +1,20 @@
 #!/usr/bin/python
 
+# **********************************************************************************
+# monitor-ws2812.py
+# **********************************************************************************
+# Script for monitoring LoraWAN Gateways based on small Linux computers
+# it's lighing some WS2812 LEDs depending on status and process
+# it's also monitoring a push button to do a clean shutdown
+#
+# Written by Charles-Henri Hallard http://ch2i.eu
+#
+# History : V1.00 2017-12-22 - Creation
+#
+# All text above must be included in any redistribution.
+#
+# **********************************************************************************
+
 import RPi.GPIO as GPIO
 import thread
 import time
