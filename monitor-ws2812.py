@@ -12,25 +12,25 @@ import subprocess
 
 # Switch push button
 gpio_pin = 17
-
-gpio_blu = 4
-gpio_yel = 18
-gpio_red = 23
-gpio_grn = 24
+gpio_led = 18
 
 internet = False
 localnet = False
 lorawan  = False
 web      = False
+
 hostapd  = False
 pktfwd   = False
 
+color_off = Color(0,0,0)
+color_red = Color(128,0,0)
+color_grn = Color(0,128,0)
+color_blu = Color(0,0,128)
+color_yel = Color(128,128,0)
 
 def signal_handler(signal, frame):
-    GPIO.output(gpio_blu, GPIO.LOW)
-    GPIO.output(gpio_yel, GPIO.LOW)
-    GPIO.output(gpio_red, GPIO.LOW)
-    GPIO.output(gpio_grn, GPIO.LOW)
+    colorSet(strip, 0, color_off )
+    colorSet(strip, 1, color_off )
     sys.exit(0)
 
 
@@ -76,7 +76,7 @@ def check_inet(delay):
       lorawan = False
 
     hostapd = check_process("hostapd")
-    pktfwd = check_process("poly_pkt_fwd")
+    pktfwd = check_process("mp_pkt_fwd")
 
     time.sleep(delay)
 
@@ -86,48 +86,41 @@ def check_inet(delay):
 GPIO.setwarnings(False)
 GPIO.setmode(GPIO.BCM)
 GPIO.setup(gpio_pin, GPIO.IN, pull_up_down = GPIO.PUD_DOWN)
-GPIO.setup(gpio_blu, GPIO.OUT)
-GPIO.setup(gpio_yel, GPIO.OUT)
-GPIO.setup(gpio_red, GPIO.OUT)
-GPIO.setup(gpio_grn, GPIO.OUT)
 
+
+# Define functions which animate LEDs in various ways.
+def colorSet(strip, led, color):
+      strip.setPixelColor(led, color)
+      strip.show()
 
 # Our function on what to do when the button is pressed
 def checkShutdown():
     if GPIO.input(gpio_pin) == 1:
-
-      GPIO.output(gpio_blu, GPIO.LOW)
-      GPIO.output(gpio_yel, GPIO.LOW)
-      GPIO.output(gpio_red, GPIO.LOW)
-      GPIO.output(gpio_grn, GPIO.LOW)
-
+      colorSet(strip, 0, color_red)
+      colorSet(strip, 1, color_off)
       time.sleep(.9)
       if GPIO.input(gpio_pin) == 1:
-        GPIO.output(gpio_blu, GPIO.HIGH)
+        colorSet(strip, 1, color_red)
         time.sleep(.9)
         if GPIO.input(gpio_pin) == 1:
-          GPIO.output(gpio_yel, GPIO.HIGH)
-          time.sleep(.9)
-          if GPIO.input(gpio_pin) == 1:
-            GPIO.output(gpio_red, GPIO.HIGH)
-            time.sleep(.9)
-            if GPIO.input(gpio_pin) == 1:
-                for x in range(0, 10):
-                  GPIO.output(gpio_blu, GPIO.HIGH)
-                  GPIO.output(gpio_yel, GPIO.HIGH)
-                  GPIO.output(gpio_red, GPIO.HIGH)
-                  GPIO.output(gpio_grn, GPIO.HIGH)
-                  time.sleep(.2)
-                  GPIO.output(gpio_blu, GPIO.LOW)
-                  GPIO.output(gpio_yel, GPIO.LOW)
-                  GPIO.output(gpio_red, GPIO.LOW)
-                  GPIO.output(gpio_grn, GPIO.LOW)
-                  time.sleep(.4)
-            print "shutdown"
-            os.system("sudo halt &")
-            time.sleep(30)
+          for x in range(0, 10):
+            colorSet(strip, 0, color_blu)
+            colorSet(strip, 1, color_blu)
+            time.sleep(.2)
+            colorSet(strip, 0, color_off)
+            colorSet(strip, 1, color_off)
+            time.sleep(.4)
+          print "shutdown"
+          os.system("sudo halt &")
+          time.sleep(30)
 
 signal.signal(signal.SIGINT, signal_handler)
+
+# Create NeoPixel object 2 LEDs, 64 Brighness GRB leds
+strip = Adafruit_NeoPixel(2, gpio_led, 800000, 5, False, 64, 0, ws.WS2811_STRIP_GRB)
+
+# Intialize the library (must be called once before other functions).
+strip.begin()
 
 try:
    thread.start_new_thread( check_inet, (5, ) )
@@ -136,52 +129,31 @@ except:
 
 # Now wait!
 while 1:
-    led_blu = GPIO.LOW
-    led_yel = GPIO.LOW
-    led_grn = GPIO.LOW
+    led0 = color_red
+    led1 = color_red
 
-    led_red = GPIO.LOW
-    if hostapd == True:
-      led_blu = GPIO.HIGH
+    if internet == True:
+      led0 = color_grn
     else:
-      led_red = GPIO.HIGH
+      if hostapd == True:
+        led0 = color_blu
 
-    GPIO.output(gpio_red, led_red)
-    GPIO.output(gpio_blu, led_blu)
+#    if web == True and lorawan == True:
+    if pktfwd == True :
+      led1 = color_grn
+    else:
+      led1 = color_red
+
+    colorSet(strip, 0, led0)
     time.sleep(.2)
     checkShutdown();
-    GPIO.output(gpio_red, GPIO.LOW)
-    GPIO.output(gpio_blu, GPIO.LOW)
+    colorSet(strip, 0, color_off)
     time.sleep(.8)
     checkShutdown();
 
-    led_red = GPIO.LOW
-    if web == True:
-      led_yel = GPIO.HIGH
-    else:
-      led_red = GPIO.HIGH
-
-    GPIO.output(gpio_red, led_red)
-    GPIO.output(gpio_yel, led_yel)
+    colorSet(strip, 1, led1)
     time.sleep(.2)
     checkShutdown();
-    GPIO.output(gpio_red, GPIO.LOW)
-    GPIO.output(gpio_yel, GPIO.LOW)
+    colorSet(strip, 1, color_off)
     time.sleep(.8)
     checkShutdown();
-
-    led_red = GPIO.LOW
-    if pktfwd == True and lorawan == True:
-      led_grn = GPIO.HIGH
-    else:
-      led_red = GPIO.HIGH
-
-    GPIO.output(gpio_red, led_red)
-    GPIO.output(gpio_grn, led_grn)
-    time.sleep(.2)
-    checkShutdown();
-    GPIO.output(gpio_red, GPIO.LOW)
-    GPIO.output(gpio_grn, GPIO.LOW)
-    time.sleep(.8)
-    checkShutdown();
-
