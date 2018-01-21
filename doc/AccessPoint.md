@@ -173,7 +173,7 @@ Replace `_ST_SSID_` with your home network SSID and `_ST_PASSWORD_` with your wi
 
 ## Permanently deal with interface bringup order
 
-    # see this [issue](https://unix.stackexchange.com/questions/396059/unable-to-establish-connection-with-mlme-connect-failed-ret-1-operation-not-p)
+see this [issue](https://unix.stackexchange.com/questions/396059/unable-to-establish-connection-with-mlme-connect-failed-ret-1-operation-not-p)
   
 Edit `/etc/rc.local` and add the following lines just before `exit 0`
 ```shell
