@@ -1,25 +1,24 @@
 #! /bin/bash
 
 # Reset RAK831 PIN
-SX1301_RESET_BCM_PIN=17
+SX1301_RESET_BCM_PIN=25
 
-echo "$SX1301_RESET_BCM_PIN"  > /sys/class/gpio/export
-echo "out" > /sys/class/gpio/gpio$SX1301_RESET_BCM_PIN/direction
-echo "0"   > /sys/class/gpio/gpio$SX1301_RESET_BCM_PIN/value
-sleep 0.1
-echo "1"   > /sys/class/gpio/gpio$SX1301_RESET_BCM_PIN/value
-sleep 0.1
-echo "0"   > /sys/class/gpio/gpio$SX1301_RESET_BCM_PIN/value
-sleep 0.1
-echo "$SX1301_RESET_BCM_PIN"  > /sys/class/gpio/unexport
+WAIT_GPIO() {
+    sleep 0.1
+}
 
+# cleanup GPIO
+if [ -d /sys/class/gpio/gpio$SX1301_RESET_BCM_PIN ]
+then
+  echo "$SX1301_RESET_BCM_PIN" > /sys/class/gpio/unexport; WAIT_GPIO
+fi
 
-# Test the connection, wait if needed.
-#while [[ $(ping -c1 google.com 2>&1 | grep " 0% packet loss") == "" ]]; do
-#  echo "[TTN Gateway]: Waiting for internet connection..."
-#  sleep 30
-#  done
+# setup GPIO
+echo "$SX1301_RESET_BCM_PIN" > /sys/class/gpio/export; WAIT_GPIO
+echo "out" > /sys/class/gpio/gpio$SX1301_RESET_BCM_PIN/direction; WAIT_GPIO
+echo "1" > /sys/class/gpio/gpio$SX1301_RESET_BCM_PIN/value; WAIT_GPIO
+echo "0" > /sys/class/gpio/gpio$SX1301_RESET_BCM_PIN/value; WAIT_GPIO
+echo "in" > /sys/class/gpio/gpio$SX1301_RESET_BCM_PIN/direction; WAIT_GPIO
 
-# Fire up the forwarder.  
-./poly_pkt_fwd
-
+# Fire up the forwarder.
+./mp_pkt_fwd
