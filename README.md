@@ -268,3 +268,11 @@ sudo ln -s /opt/loragw/monitor-gpio.py /opt/loragw/monitor.py
 ```shell
 sudo systemctl start monitor
 ```
+
+# Add some other features
+
+Here are other feature I use sometime on my gateways:
+
+- Put the whole filesystem in [ReadOnly](https://hallard.me/raspberry-pi-read-only/)
+- Setup PI as an access point](https://github.com/ch2i/LoraGW-Setup/blob/master/doc/AccessPoint.md)
+- Install a nice local [LoraWAN Server](https://github.com/gotthardp/lorawan-server/blob/master/doc/Installation.md)
