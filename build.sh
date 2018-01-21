@@ -5,16 +5,16 @@ INSTALL_DIR="/opt/loragw"
 mkdir -p $INSTALL_DIR/dev
 cd $INSTALL_DIR/dev
 
-if [ ! -d wiringPi ]; then
-    git clone git://git.drogon.net/wiringPi  || { echo 'Cloning wiringPi failed.' ; exit 1; }
-    cd wiringPi
-else
-    cd wiringPi
-    git reset --hard
-    git pull
-fi
-./build
-cd ..
+#if [ ! -d wiringPi ]; then
+#    git clone git://git.drogon.net/wiringPi  || { echo 'Cloning wiringPi failed.' ; exit 1; }
+#    cd wiringPi
+#else
+#    cd wiringPi
+#    git reset --hard
+#    git pull
+#fi
+#./build
+#cd ..
 
 if [ ! -d lora_gateway ]; then
     git clone https://github.com/kersing/lora_gateway.git  || { echo 'Cloning lora_gateway failed.' ; exit 1; }
