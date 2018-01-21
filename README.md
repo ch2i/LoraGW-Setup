@@ -1,3 +1,10 @@
+# Lora Gateway base setup for SX1301 based concentrators
+
+This setup is used for some LoraWAN concentrators based on small computers such as Raspberry PI or others. 
+For example it works fine with the RAK831 PI Zero [shield](https://github.com/hallard/RAK831-Zero)
+
+<img src="https://raw.githubusercontent.com/hallard/RAK831-Zero/master/pictures/PiZero-RAK831-finished.jpg" alt="Full">     
+
 # Installation
 
 Download [Raspbian lite image](https://downloads.raspberrypi.org/raspbian_lite_latest) and [flash](https://www.raspberrypi.org/documentation/installation/installing-images/README.md) it to your SD card using [etcher](http://etcher.io/).
@@ -135,30 +142,7 @@ then *reboot and log back with `loragw` user*.
 sudo reboot
 ``` 
 
-
-## Get CH2i Gateway Install repository
-``` 
-git clone https://github.com/ch2i/LoraGW-Setup
-cd LoraGW-Setup
-```
-
-## Packet Forwarder
-
-New Multi-protocol Packet Forwarder by Jac @Kersing (thanks to @jpmeijers for scripting stuff)
-Now build the whole thing, time to get a coffe, it can take 10/15 minutes!
-``` 
-sudo ./build.sh
-``` 
-
-## Configure Gateway on TTN
-
-Now you need to register your new GW on ttn, see [gateway registration](https://www.thethingsnetwork.org/docs/gateways/registration.html#via-gateway-connector), fill the GW_ID and GW_KEY when running
-
-``` 
-sudo ./setup.sh
-``` 
-
-## Install WS2812 driver 
+## Install WS2812 driver for onboard LED
 
 The onboard WS2812 library and the Raspberry Pi audio both use the PWM, they cannot be used together. You will need to blacklist the Broadcom audio kernel module by editing a file 
 ``` 
@@ -209,3 +193,78 @@ sudo ./LoraGW-Setup/testled.py
 sudo ./LoraGW-Setup/testled.js
 ``` 
 
+
+## Get CH2i Gateway Install repository
+``` 
+git clone https://github.com/ch2i/LoraGW-Setup
+cd LoraGW-Setup
+```
+
+## Packet Forwarder
+
+New Multi-protocol Packet Forwarder by Jac @Kersing (thanks to @jpmeijers for scripting stuff)
+Now build the whole thing, time to get a coffe, it can take 10/15 minutes!
+``` 
+sudo ./build.sh
+``` 
+
+## Configure Gateway on TTN
+
+Now you need to register your new GW on ttn, see [gateway registration](https://www.thethingsnetwork.org/docs/gateways/registration.html#via-gateway-connector), fill the GW_ID and GW_KEY when running
+
+``` 
+sudo ./setup.sh
+``` 
+
+# Usefull information
+
+## Startup
+That's it, reboot your gateway and all should be working fine. If you are using PI Zero [shield](https://github.com/hallard/RAK831-Zero), the 2 LED should be blinking green when all is running correctly.
+
+## Shutdown
+You can press (and let it pressed) the switch push button, leds well become RED anf after 2s start blink in blue. If you release button when they blink blue, the Pi will initiate a shutdown. So let it 30s before removing power.
+
+If you have a raspberry PI with this [IC880A shield](https://github.com/ch2i/iC880A-Raspberry-PI), and if you modded the `/boot/config.txt` file with following lines added into:
+
+```
+# When system if Halted/OFF Light Green LED
+dtoverlay=gpio-poweroff,gpiopin=24
+```
+then the Green LED (gpio24) will stay on when you can remove the power of the gateway. It's really a great indicator.
+
+## Detailled information
+
+The installed sofware is located on `/opt/loragw`, I changed this name (original was ttn-gateway) just because not all my gateways are connected to TTN so I wanted to have a more generic setup.
+
+```shell
+ls -al /opt/loragw/
+total 344
+drwxr-xr-x 3 root root   4096 Jan 21 03:15 .
+drwxr-xr-x 5 root root   4096 Jan 21 01:01 ..
+drwxr-xr-x 9 root root   4096 Jan 21 01:03 dev
+-rw-r--r-- 1 root root   6568 Jan 21 01:15 global_conf.json
+-rwxr-xr-- 1 root root   3974 Jan 21 01:15 monitor-gpio.py
+-rwxr-xr-- 1 root root   3508 Jan 21 03:15 monitor.py
+-rwxr-xr-- 1 root root   4327 Jan 21 01:15 monitor-ws2812.py
+-rwxr-xr-x 1 root root 307680 Jan 21 01:14 mp_pkt_fwd
+-rwxr-xr-- 1 root root    642 Jan 21 01:36 start.sh
+```
+
+LED blinking and push button functions are done with the monitor.py service (launched by systemd at startup).
+There are 2 versions of this service (with symlink), one with WS2812B led and another for classic GPIO LED such as the one on this [IC880A shield](https://github.com/ch2i/iC880A-Raspberry-PI). So if you want to change you can do it like that
+
+### stop the service
+```shell
+sudo systemctl stop monitor
+```
+
+### change the link (were with GPIO version)
+```shell
+sudo rm /opt/loragw/monitor.py
+sudo ln -s /opt/loragw/monitor-gpio.py /opt/loragw/monitor.py
+```
+
+### start the service
+```shell
+sudo systemctl start monitor
+```
