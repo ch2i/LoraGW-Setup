@@ -222,17 +222,15 @@ sudo ./setup.sh
 That's it, reboot your gateway and all should be working fine. If you are using PI Zero [shield](https://github.com/hallard/RAK831-Zero), the 2 LED should be blinking green when all is running correctly.
 
 ## Shutdown
-You can press (and let it pressed) the switch push button led well become RED anf after 2s start blink in blue. If you release button when they blink blue, the Pi will initiate a shutdown. So let it 30s before removing power.
+You can press (and let it pressed) the switch push button, leds well become RED anf after 2s start blink in blue. If you release button when they blink blue, the Pi will initiate a shutdown. So let it 30s before removing power.
 
-If you have a raspberry PI 3 with this [IC880A shield](https://github.com/ch2i/iC880A-Raspberry-PI), and if you modded the `/boot/config.txt` file with following lines added into
+If you have a raspberry PI with this [IC880A shield](https://github.com/ch2i/iC880A-Raspberry-PI), and if you modded the `/boot/config.txt` file with following lines added into:
+
 ```
-# Set Activity LED to GPIO4
-dtoverlay=pi3-act-led,gpio=4
-
 # When system if Halted/OFF Light Green LED
 dtoverlay=gpio-poweroff,gpiopin=24
 ```
-then the Green LED (gpio24) will stay lighted when you can remove the power of the gateway. It's really a great indicator.
+then the Green LED (gpio24) will stay on when you can remove the power of the gateway. It's really a great indicator.
 
 ## Detailled information
 
@@ -252,10 +250,21 @@ drwxr-xr-x 9 root root   4096 Jan 21 01:03 dev
 -rwxr-xr-- 1 root root    642 Jan 21 01:36 start.sh
 ```
 
-LED blinking is done with the monitor.py service (launched by systemd at startup).
+LED blinking and push button functions are done with the monitor.py service (launched by systemd at startup).
 There are 2 versions of this service (with symlink), one with WS2812B led and another for classic GPIO LED such as the one on this [IC880A shield](https://github.com/ch2i/iC880A-Raspberry-PI). So if you want to change you can do it like that
 
+### stop the service
+```shell
+sudo systemctl stop monitor
+```
+
+### change the link (were with GPIO version)
 ```shell
 sudo rm /opt/loragw/monitor.py
 sudo ln -s /opt/loragw/monitor-gpio.py /opt/loragw/monitor.py
+```
+
+### start the service
+```shell
+sudo systemctl start monitor
 ```
