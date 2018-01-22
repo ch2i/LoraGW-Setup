@@ -269,6 +269,50 @@ sudo ln -s /opt/loragw/monitor-gpio.py /opt/loragw/monitor.py
 sudo systemctl start monitor
 ```
 
+### Check packed forwarder log 
+```shell
+sudo journalctl -f -u loragw
+```
+
+
+```
+-- Logs begin at Sun 2018-01-21 14:57:08 CET. --
+Jan 22 01:00:41 loragw loragw[240]: ### GPS IS DISABLED!
+Jan 22 01:00:41 loragw loragw[240]: ### [PERFORMANCE] ###
+Jan 22 01:00:41 loragw loragw[240]: # Upstream radio packet quality: 100.00%.
+Jan 22 01:00:41 loragw loragw[240]: # Semtech status report send.
+Jan 22 01:00:41 loragw loragw[240]: ##### END #####
+Jan 22 01:00:41 loragw loragw[240]: 01:00:41  INFO: [TTN] bridge.eu.thethings.network RTT 52
+Jan 22 01:00:41 loragw loragw[240]: 01:00:41  INFO: [TTN] send status success for bridge.eu.thethings.network
+Jan 22 01:00:53 loragw loragw[240]: 01:00:53  INFO: Disabling GPS mode for concentrator's counter...
+Jan 22 01:00:53 loragw loragw[240]: 01:00:53  INFO: host/sx1301 time offset=(1516578208s:159048µs) - drift=-55µs
+Jan 22 01:00:53 loragw loragw[240]: 01:00:53  INFO: Enabling GPS mode for concentrator's counter.
+Jan 22 01:01:11 loragw loragw[240]: ##### 2018-01-22 00:01:11 GMT #####
+Jan 22 01:01:11 loragw loragw[240]: ### [UPSTREAM] ###
+Jan 22 01:01:11 loragw loragw[240]: # RF packets received by concentrator: 0
+Jan 22 01:01:11 loragw loragw[240]: # CRC_OK: 0.00%, CRC_FAIL: 0.00%, NO_CRC: 0.00%
+Jan 22 01:01:11 loragw loragw[240]: # RF packets forwarded: 0 (0 bytes)
+Jan 22 01:01:11 loragw loragw[240]: # PUSH_DATA datagrams sent: 0 (0 bytes)
+Jan 22 01:01:11 loragw loragw[240]: # PUSH_DATA acknowledged: 0.00%
+Jan 22 01:01:11 loragw loragw[240]: ### [DOWNSTREAM] ###
+Jan 22 01:01:11 loragw loragw[240]: # PULL_DATA sent: 0 (0.00% acknowledged)
+Jan 22 01:01:11 loragw loragw[240]: # PULL_RESP(onse) datagrams received: 0 (0 bytes)
+Jan 22 01:01:11 loragw loragw[240]: # RF packets sent to concentrator: 0 (0 bytes)
+Jan 22 01:01:11 loragw loragw[240]: # TX errors: 0
+Jan 22 01:01:11 loragw loragw[240]: ### BEACON IS DISABLED!
+Jan 22 01:01:11 loragw loragw[240]: ### [JIT] ###
+Jan 22 01:01:11 loragw loragw[240]: # INFO: JIT queue contains 0 packets.
+Jan 22 01:01:11 loragw loragw[240]: # INFO: JIT queue contains 0 beacons.
+Jan 22 01:01:11 loragw loragw[240]: ### GPS IS DISABLED!
+Jan 22 01:01:11 loragw loragw[240]: ### [PERFORMANCE] ###
+Jan 22 01:01:11 loragw loragw[240]: # Upstream radio packet quality: 0.00%.
+Jan 22 01:01:11 loragw loragw[240]: # Semtech status report send.
+Jan 22 01:01:11 loragw loragw[240]: ##### END #####
+Jan 22 01:01:11 loragw loragw[240]: 01:01:11  INFO: [TTN] bridge.eu.thethings.network RTT 53
+Jan 22 01:01:11 loragw loragw[240]: 01:01:11  INFO: [TTN] send status success for bridge.eu.thethings.network
+```
+
+
 # Add some other features
 
 Here are other feature I use sometime on my gateways:
