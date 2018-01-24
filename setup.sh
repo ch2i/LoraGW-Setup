@@ -24,7 +24,7 @@ if [[ $GW_KEY == "" ]]; then
 fi
 
 if [[ $GW_RESET_PIN == "" ]]; then
-    GW_RESET_PIN=22
+    GW_RESET_PIN=25
     echo "No environement for GW_RESET_PIN"
     echo "Please select your reset pin"
     echo "see https://github.com/jpmeijers/ttn-resin-gateway-rpi/blob/master/README.md"
