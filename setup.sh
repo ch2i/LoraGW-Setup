@@ -38,7 +38,7 @@ if [[ $GW_RESET_PIN == "" ]]; then
 fi
 
 # Set the reset în in startup shell
-sed -i -- 's/PIN=25/PIN='"$GW_RESET_PIN"'/g' ./start.sh
+sudo sed -i -- "s/RESET_BCM_PIN=[0-9]+/RESET_BCM_PIN=$GW_RESET_PIN/g" ./start.sh
 
 # script to get config from TTN server
 python set_config.py
@@ -46,24 +46,26 @@ python set_config.py
 # Copy config to running folder
 sudo mv global_conf.json $GW_DIR/
 sudo cp start.sh $GW_DIR/
-#sudo cp off-button.py $GW_DIR/
-
-# Adding off button management
-#sudo sed -i -e '$i \\'"$GW_DIR"'/off-button.py &\n' /etc/rc.local
 
 # Prepare start forwarder as systemd script
 sudo cp ./loragw.service /lib/systemd/system/
 sudo systemctl enable loragw.service
 sudo systemctl start loragw.service
 
-# Prepare monitor as systemd script
-sudo cp ./monitor-ws2812.py $GW_DIR/
-sudo cp ./monitor-gpio.py $GW_DIR/
-sudo ln -s $GW_DIR/monitor-ws2812.py $GW_DIR/monitor.py
-sudo cp ./monitor.service /lib/systemd/system/
-sudo systemctl enable monitor.service
-sudo systemctl start monitor.service
+# ask if we need to enable monitoring service
+echo "You can enable monitor service that manage blinking led to"
+echo "display status and also add button management to shutdown PI"
+echo -n "Would you like to enable this [Y/n]:"
+read rep
 
+if [[ "$rep" == "Y" ]]; then
+  sudo cp ./monitor-ws2812.py $GW_DIR/
+  sudo cp ./monitor-gpio.py $GW_DIR/
+  sudo ln -s $GW_DIR/monitor-ws2812.py $GW_DIR/monitor.py
+  sudo cp ./monitor.service /lib/systemd/system/
+  sudo systemctl enable monitor.service
+  sudo systemctl start monitor.service
+fi
 
 echo "all done, please check service running log with"
 echo "sudo journalctl -f -u loragw.service"
