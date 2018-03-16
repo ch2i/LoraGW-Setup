@@ -355,5 +355,5 @@ Here are other feature I use sometime on my gateways:
 
 - Put the whole filesystem in [ReadOnly](https://hallard.me/raspberry-pi-read-only/)
 - Setup PI as a WiFi [access point](https://github.com/ch2i/LoraGW-Setup/blob/master/doc/AccessPoint.md)
-- Install a nice local [LoraWAN Server](https://github.com/gotthardp/lorawan-server/blob/master/doc/Installation.md)
+- Install a nice local [LoraWAN Server](https://github.com/ch2i/LoraGW-Setup/blob/master/doc/Lorawan-Server.md)
 - Use a OLED [display](https://github.com/ch2i/LoraGW-Setup/blob/master/doc/DisplayOled.md) 
