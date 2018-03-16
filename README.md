@@ -121,6 +121,12 @@ sudo raspi-config
   - advanced options, expand filesystem
   - advanced options, reduce video memory split set to 16M
 
+
+Now give `loragw` access to hardware I2C, SPI and GPIO
+```shell
+sudo usermod -a -G i2c,spi,gpio loragw
+``` 
+
 then *reboot*.
 ```shell
 sudo reboot
@@ -218,6 +224,11 @@ cd LoraGW-Setup
 sudo ./testled.py
 sudo ./testled.js
 ``` 
+
+## Install Python I2C/SPI OLED library (if you want to use OLED dispay)
+
+Optionnaly you can add OLED to display usefull informations on it. Please look at this [documentation](https://github.com/ch2i/LoraGW-Setup/blob/master/doc/DisplayOled.md) for more informations
+
 
 ## Packet Forwarder
 
@@ -345,3 +356,4 @@ Here are other feature I use sometime on my gateways:
 - Put the whole filesystem in [ReadOnly](https://hallard.me/raspberry-pi-read-only/)
 - Setup PI as a WiFi [access point](https://github.com/ch2i/LoraGW-Setup/blob/master/doc/AccessPoint.md)
 - Install a nice local [LoraWAN Server](https://github.com/gotthardp/lorawan-server/blob/master/doc/Installation.md)
+- Use a OLED [display](https://github.com/ch2i/LoraGW-Setup/blob/master/doc/DisplayOled.md) 
