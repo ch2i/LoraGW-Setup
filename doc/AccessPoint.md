@@ -19,8 +19,12 @@ dhcp-range=192.168.50.50,192.168.50.100,255.255.255.0,12h
 
 After that my AP is 192.168.50.1 and distributing address from `192.168.50.50` to `192.168.50.100`
 
+Also you can uncomment dedicated RPI 3 Wifi config (works for PI Zero W)
+```
+```
 
-**Following is depreceated**
+
+**The following part is depreceated**
 
 ## Install the packages you need for DNS, Access Point and Firewall rules.
 ```
