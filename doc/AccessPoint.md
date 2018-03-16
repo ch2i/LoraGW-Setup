@@ -1,5 +1,27 @@
 # Promote Raspberry PI based gateway as a WiFi access point
 
+The following procedure is used for reference or for testing. Since months, I'm using excellent [RaspAP-webgui](https://github.com/billz/raspap-webgui) to make access point.
+
+I'm installing it with the quick installer [method](https://github.com/billz/raspap-webgui#quick-installer) but as I've specific devices, I'm changing default IP network before reboot by
+
+### in `/etc/dhcpcd.conf`
+```
+static ip_address=192.168.50.1/24
+static routers=192.168.50.1
+static domain_name_server=8.8.8.8 8.8.4.4
+```
+
+### in `/etc/dnsmasq.conf`
+```
+interface=wlan0
+dhcp-range=192.168.50.50,192.168.50.100,255.255.255.0,12h
+```
+
+After that my AP is 192.168.50.1 and distributing address from `192.168.50.50` to `192.168.50.100`
+
+
+**Following is depreceated**
+
 ## Install the packages you need for DNS, Access Point and Firewall rules.
 ```
 sudo apt-get install hostapd dnsmasq iptables-persistent
