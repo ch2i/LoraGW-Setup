@@ -19,13 +19,12 @@ import thread
 import time
 import os
 import urllib
-from neopixel import *
 import sys
 import signal
 import subprocess
 
 # Switch push button
-gpio_pin = 17
+gpio_pin = 19
 
 gpio_blu = 4
 gpio_yel = 18
