@@ -81,7 +81,7 @@ for example my full `/opt/loragw/local_conf.json` is configured with 3 Gateways 
 
 You can enable/disable each server with key `serv_enabled` set to `true` or `false`
 
-```
+```json
 {
   "gateway_conf": {
     "gateway_ID": "B827EBFFFED41691",
