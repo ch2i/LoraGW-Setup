@@ -139,9 +139,14 @@ draw.text((col1, line4), lan_ip("wlan0"),  font=font10, fill=255)
 draw.text((col1, line5), network("wlan0"),  font=font10, fill=255)
 ```
 
-
-Once all is setup and running you can try to launch the OLED script with
-
+Once all is setup and running you can enable disbale OLED service with
 ``` 
-/opt/loragw/oled.py
+sudo systemctl enable oled
+sudo systemctl disable oled
+```
+
+And start or stop the OLED service with
+``` 
+sudo systemctl start oled
+sudo systemctl stop oled
 ```
