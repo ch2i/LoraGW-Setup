@@ -32,3 +32,28 @@ Then to improove log rotation, you can add this lines to
 }
 ```
 
+### Forward packets to local Server
+
+If you installed all stuff from this repository, you just need to enable the forwarder to send packed to the Local LoRaWAN server. 
+For this set the line `serv_enabled` to `true` for the server `127.0.0.1`
+Take care, the one that has both port to 1680, not the one with 1688/1689 (this one is for OLED)
+
+`sudo nano /opt/loragw/global_conf.json`
+
+```json
+            {
+                "server_address": "127.0.0.1",
+                "serv_enabled": true,           // <== set this one to true
+                "serv_port_up": 1680,
+                "serv_port_down": 1680
+            }
+```
+
+And restart loragw service to take into account the new local server with
+``` 
+sudo systemctl stop loragw
+sudo systemctl start loragw
+```
+
+
+
