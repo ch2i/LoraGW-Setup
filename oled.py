@@ -31,12 +31,13 @@ class MyUDPHandler(SocketServer.BaseRequestHandler):
   def handle(self):
     global json_data
     data = self.request[0]
-    #print(self.request)
-    data = data[12::]
     #print(data)
+    #data = data[12::]
+    #print("\r\n")
+    print(data)
     js_data = json.loads(data)
 
-    if js_data.get('rxpk'):
+    if js_data.get('type')=='uplink':
       json_data = data
 
 def do_nothing(obj):
@@ -97,10 +98,11 @@ def stats():
       if json_data!=None:
         try:
           o = json.loads(json_data)
-          draw.text((col1, line1),"RSSI %sdBi" % (o["rxpk"][0]["rssi"]), font=font10, fill=255)
-          draw.text((col1, line2),"Chan %s" % (o["rxpk"][0]["chan"]), font=font10, fill=255)
-          draw.text((col1, line3),"Freq %.2f MHz" % (o["rxpk"][0]["freq"]), font=font10, fill=255)
-          draw.text((col1, line4),"Rate %s" % (o["rxpk"][0]["datr"]), font=font10, fill=255)
+          draw.text((col1, line1),"Mote %s" % (o["mote"]), font=font10, fill=255)
+          draw.text((col1, line2),"RSSI %sdBi" % ( o["rssi"]), font=font10, fill=255)
+          draw.text((col1, line3),"Chan %s" % (o["chan"]), font=font10, fill=255)
+          draw.text((col1, line4),"Freq %.2f MHz" % (o["freq"]), font=font10, fill=255)
+          draw.text((col1, line5),"Rate %s" % (o["datr"]), font=font10, fill=255)
         except:
           draw.text((col1, line1),"Invalid JSON received", font=font10, fill=255)
           pass
