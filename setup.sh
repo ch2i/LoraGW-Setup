@@ -79,9 +79,10 @@ if [[ "$rep" == "Y" ]]; then
   sudo systemctl enable oled.service
   sudo systemctl start oled.service
   echo "Oled service enabled!"
-  echo "Don't forget to set the OLED wiring and type"
-  echo "by editing the /opt/loragw/oled.py script"
-  echo "see https://github.com/ch2i/LoraGW-Setup/blob/master/doc/DisplayOled.md#configure-oled-hardware"
+  echo "Please follow the procedure located here to finish setup"
+  echo "https://github.com/ch2i/LoraGW-Setup/blob/master/doc/DisplayOled.md"
+  echo "Also don't forget to set the OLED wiring and type by editing file"
+  echo "/opt/loragw/oled.py (as described into procedure)"
 fi
 
 echo "all done, please check service running log with"
