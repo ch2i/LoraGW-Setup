@@ -258,8 +258,27 @@ Check all is fine also at startup, reboot your gateway.
 sudo reboot
 ``` 
 
+## LED Blinking colors
+
+### LED 1
+
+- green => connected to Internet
+- blue  => No Internet connexion but gateway [WiFi AP](https://github.com/ch2i/LoraGW-Setup/blob/master/doc/AccessPoint.md) is up
+- red => No Internet, no WiFi Access Point
+
+### LED 2
+
+- green => packet forwarder is started and running
+- blue  => no packed forwarder but local [LoRaWAN server](https://github.com/ch2i/LoraGW-Setup/blob/master/doc/Lorawan-Server.md) is started
+- red => No packet forwarder nor LoRaWAN server
+
+### Change behaviour
+
+You can change LED code behaviour at the end of script `/opt/loragw/monitor.py`
+
+
 ## Shutdown
-You can press (and let it pressed) the switch push button, leds well become RED anf after 2s start blink in blue. If you release button when they blink blue, the Pi will initiate a shutdown. So let it 30s before removing power.
+You can press (and let it pressed) the switch push button, leds well become RED and after 2s start blinking in blue. If you release button when they blink blue, the Pi will initiate a shutdown. So let it 30s before removing power.
 
 If you have a raspberry PI with this [IC880A shield](https://github.com/ch2i/iC880A-Raspberry-PI), and if you modded the `/boot/config.txt` file with following lines added into:
 
