@@ -29,8 +29,8 @@ if [[ $GW_RESET_PIN == "" ]]; then
     echo "Please select your reset pin"
     echo "see https://github.com/jpmeijers/ttn-resin-gateway-rpi/blob/master/README.md"
     echo "under section Reset Pin Values"
-    echo "enter 25 (GPIO25) for classic Gonzalo Casas backplane or this RAK831 shield"
-    echo "enter 17 (GPIO17) for classic ic880A by ch2i"
+    echo "enter 25 (GPIO25) for this RAK831 shield or classic Gonzalo Casas"
+    echo "enter 17 (GPIO17) for classic ic880A by CH2i"
     echo ""
     echo -n "Please enter GW_RESET_PIN [$GW_RESET_PIN]:"
     read GW_RESET_PIN
@@ -53,18 +53,35 @@ sudo systemctl enable loragw.service
 sudo systemctl start loragw.service
 
 # ask if we need to enable monitoring service
+sudo cp ./oled.py $GW_DIR/
+sudo cp ./monitor-ws2812.py $GW_DIR/
+sudo cp ./monitor-gpio.py $GW_DIR/
+sudo ln -s $GW_DIR/monitor-ws2812.py $GW_DIR/monitor.py
+sudo cp ./monitor.service /lib/systemd/system/
+sudo cp ./oled.service /lib/systemd/system/
+
 echo "You can enable monitor service that manage blinking led to"
 echo "display status and also add button management to shutdown PI"
 echo -n "Would you like to enable this [Y/n]:"
 read rep
 
 if [[ "$rep" == "Y" ]]; then
-  sudo cp ./monitor-ws2812.py $GW_DIR/
-  sudo cp ./monitor-gpio.py $GW_DIR/
-  sudo ln -s $GW_DIR/monitor-ws2812.py $GW_DIR/monitor.py
-  sudo cp ./monitor.service /lib/systemd/system/
   sudo systemctl enable monitor.service
   sudo systemctl start monitor.service
+  echo "monitor service enabled!"
+fi
+
+echo "You can enable OLED display service to show informations"
+echo -n "Would you like to enable this [Y/n]:"
+read rep
+
+if [[ "$rep" == "Y" ]]; then
+  sudo systemctl enable oled.service
+  sudo systemctl start oled.service
+  echo "Oled service enabled!"
+  echo "Don't forget to set the OLED wiring and type"
+  echo "by editing the /opt/loragw/oled.py script"
+  echo "see https://github.com/ch2i/LoraGW-Setup/blob/master/doc/DisplayOled.md#configure-oled-hardware"
 fi
 
 echo "all done, please check service running log with"
