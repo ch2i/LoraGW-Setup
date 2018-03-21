@@ -1,0 +1,12 @@
+[Unit]
+Description=LoraGW OLED service
+
+[Service]
+WorkingDirectory=/opt/loragw/
+ExecStart=/opt/loragw/oled.py
+SyslogIdentifier=monitor
+Restart=on-failure
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target
