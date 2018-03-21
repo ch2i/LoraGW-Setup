@@ -1,5 +1,5 @@
 [Unit]
-Description=CH2i monitoring service
+Description=LoraGW monitoring service
 
 [Service]
 WorkingDirectory=/opt/loragw/
