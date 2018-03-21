@@ -71,7 +71,7 @@ ssh pi@raspberrypi.local
 
 Remember default login/paswword (ssh or serial console) is pi/raspberry.
 
-So please **change this default password immediatly**
+So please **for security reasons, you should change this default password**
 ```shell
 passwd 
 ``` 
@@ -107,40 +107,29 @@ sudo cp /home/pi/.bashrc /home/loragw/
 sudo chown loragw:loragw /home/loragw/.*
 ``` 
 
+Give `loragw` access to hardware I2C, SPI and GPIO
+```shell
+sudo usermod -a -G i2c,spi,gpio loragw
+``` 
+
 Now do some system configuration with `raspi-config` tool (bold are mandatory)
 ```shell
 sudo raspi-config
 ``` 
 
-  - change user password (Type a strong password)
   - network options, change hostname (loragw for example)
-  - localization options, change Locale to EN_us.UTF8
   - localization options, change keyboard layout
   - localization options, change time zone
   - **interfacing options, enable SPI, I2C** Serial and SSH (if not already done)
   - advanced options, expand filesystem
   - advanced options, reduce video memory split set to 16M
 
-
-Now give `loragw` access to hardware I2C, SPI and GPIO
-```shell
-sudo usermod -a -G i2c,spi,gpio loragw
-``` 
-
-then *reboot*.
-```shell
-sudo reboot
-``` 
+then *reboot* when asked.
 
 log back with `loragw` user and if you changed hostname to loragw, use this command
 ```shell
 ssh loragw@loragw.local
 ``` 
-
-## Get CH2i Gateway Install repository
-``` 
-git clone https://github.com/ch2i/LoraGW-Setup
-```
 
 ## Optionnal, Install log2ram this will preserve your SD card
 ```shell
@@ -149,6 +138,16 @@ cd log2ram
 chmod +x install.sh uninstall.sh
 sudo ./install.sh
 sudo ln -s /usr/local/bin/ram2disk /etc/cron.hourly/
+```
+
+Reboot to activate it if installed
+```shell
+sudo reboot
+```
+
+## Get CH2i Gateway Install repository
+``` 
+git clone https://github.com/ch2i/LoraGW-Setup
 ```
 
 ## Install nodejs
@@ -220,7 +219,7 @@ npm link rpi-ws281x-native
 ### Test WS2812 LED if you have any, in python or nodejs
 Check that led color match the color displayed on console because on some WS2812B led, Red and Green could be reversed.
 ``` 
-cd LoraGW-Setup
+cd ~/LoraGW-Setup
 sudo ./testled.py
 sudo ./testled.js
 ``` 
@@ -230,19 +229,21 @@ sudo ./testled.js
 Optionnaly you can add OLED to display usefull informations on it. Please look at this [documentation](https://github.com/ch2i/LoraGW-Setup/blob/master/doc/DisplayOled.md) for more informations
 
 
-## Packet Forwarder
+## Build and setup Packet Forwarder
 
 New Multi-protocol Packet Forwarder by Jac @Kersing (thanks to @jpmeijers for scripting stuff)
-Now build the whole thing, time to get a coffe, it can take 10/15 minutes!
+Now build the whole thing, time to get a(nother) coffe, it can take 10/15 minutes!
 ``` 
 cd ~/LoraGW-Setup
 sudo ./build.sh
 ``` 
 
-## Configure Gateway on TTN
+## Configure Gateway on TTN console
 
-Now you need to register your new GW on ttn, see [gateway registration](https://www.thethingsnetwork.org/docs/gateways/registration.html#via-gateway-connector), fill the GW_ID and GW_KEY when running
+Now you need to register your new GW on ttn before next step, see [gateway registration](https://www.thethingsnetwork.org/docs/gateways/registration.html#via-gateway-connector), fill the GW_ID and GW_KEY when running
 
+## Launch TTN gateway configuration
+This script will configure forwarder and all needed configuration 
 ``` 
 sudo ./setup.sh
 ``` 
