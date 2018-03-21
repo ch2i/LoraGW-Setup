@@ -60,6 +60,7 @@ sudo ln -s $GW_DIR/monitor-ws2812.py $GW_DIR/monitor.py
 sudo cp ./monitor.service /lib/systemd/system/
 sudo cp ./oled.service /lib/systemd/system/
 
+echo ""
 echo "You can enable monitor service that manage blinking led to"
 echo "display status and also add button management to shutdown PI"
 echo -n "Would you like to enable this [Y/n]:"
@@ -71,6 +72,7 @@ if [[ "$rep" == "Y" ]]; then
   echo "monitor service enabled!"
 fi
 
+echo ""
 echo "You can enable OLED display service to show informations"
 echo -n "Would you like to enable this [Y/n]:"
 read rep
@@ -85,6 +87,7 @@ if [[ "$rep" == "Y" ]]; then
   echo "/opt/loragw/oled.py (as described into procedure)"
 fi
 
+echo ""
 echo "all done, please check service running log with"
 echo "sudo journalctl -f -u loragw.service"
 
