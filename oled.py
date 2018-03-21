@@ -105,15 +105,15 @@ def stats():
           draw.text((col1, line1),"Invalid JSON received", font=font10, fill=255)
           pass
       else:
-        draw.text((col1, line1),"No LoraWAN Data yet", font=font10, fill=255)
+        draw.text((col1, line1),"No LoRaWAN Data yet", font=font10, fill=255)
 
       looper=1
     elif looper==1:
       draw.text((col1, line1),"Host :%s" % socket.gethostname(), font=font10, fill=255)
       draw.text((col1, line2), lan_ip("wlan0"),  font=font10, fill=255)
       draw.text((col1, line3), network("wlan0"),  font=font10, fill=255)
-      draw.text((col1, line4), lan_ip("uap0"),  font=font10, fill=255)
-      draw.text((col1, line5), network("uap0"),  font=font10, fill=255)
+      #draw.text((col1, line4), lan_ip("uap0"),  font=font10, fill=255)
+      #draw.text((col1, line5), network("uap0"),  font=font10, fill=255)
       looper=2
     elif looper==2:
       tempC = int(open('/sys/class/thermal/thermal_zone0/temp').read())
