@@ -272,6 +272,22 @@ if(os.getenv('SERVER_3_ENABLED', "false")=="true"):
   gateway_conf['servers'].append(server)
 
 
+# Add GW Traff server
+server = {}
+server['serv_type'] = "gwtraf"
+server['server_address'] = "127.0.0.1"
+server['serv_port_up'] = 1688
+server['serv_port_down'] = 1689
+gateway_conf['servers'].append(server)
+
+# Add Local LoRaWAN server
+server = {}
+server['server_address'] = "127.0.0.1"
+server['serv_port_up'] = 1680
+server['serv_port_down'] = 1680
+gateway_conf['servers'].append(server)
+ 
+
 # We merge the json objects from the global_conf and local_conf and save it to the global_conf.
 # Therefore there will not be a local_conf.json file.
 local_conf = {'SX1301_conf': sx1301_conf, 'gateway_conf': gateway_conf}
