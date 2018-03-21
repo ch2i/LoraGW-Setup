@@ -278,6 +278,7 @@ server['serv_type'] = "gwtraf"
 server['server_address'] = "127.0.0.1"
 server['serv_port_up'] = 1688
 server['serv_port_down'] = 1689
+server['serv_enabled'] = False
 gateway_conf['servers'].append(server)
 
 # Add Local LoRaWAN server
@@ -285,6 +286,7 @@ server = {}
 server['server_address'] = "127.0.0.1"
 server['serv_port_up'] = 1680
 server['serv_port_down'] = 1680
+server['serv_enabled'] = False
 gateway_conf['servers'].append(server)
  
 
