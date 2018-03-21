@@ -8,10 +8,16 @@ sudo apt-get install i2c-tools
 
 ## Increase the I2C baudrate from the default of 100KHz to 400KHz
 
-add this line to `/boot/config.txt`
+```
+sudo nano /boot/config.txt
+```
+
+add this line at the end of the file
 ```
 dtparam=i2c_arm=on,i2c_baudrate=400000
 ```
+
+
 
 ## Add your user to I2C group 
 
@@ -48,7 +54,6 @@ you should see something in your OLED I2C address, here it's 3C (Hex)
 ### Install dependencies
 ``` 
 sudo apt install python-dev python-pip libfreetype6-dev libjpeg-dev build-essential
-sudo apt install libsdl-dev libportmidi-dev libsdl-ttf2.0-dev libsdl-mixer1.2-dev libsdl-image1.2-dev
 ```
 
 ### Install luma OLED core 
@@ -57,32 +62,20 @@ You can go for a coffe after this one, takes some time
 sudo -H pip install --upgrade luma.oled
 ``` 
 
-### Install examples 
-``` 
-sudo pip install --upgrade setuptools
-git clone https://github.com/rm-hull/luma.examples.git
-cd luma.examples
-sudo -H pip install -e .
-```
-
-### Copy examples fonts to system
+### Get examples files (and font)
 ``` 
 sudo mkdir -p /usr/share/fonts/truetype/luma
-sudo cp ~/luma.examples/examples/fonts/*.ttf /usr/share/fonts/truetype/luma/
+git clone https://github.com/rm-hull/luma.examples.git
+sudo cp luma.examples/examples/fonts/*.ttf /usr/share/fonts/truetype/luma/
 ```
 
-## Configure forwarder to send stats to OLED process
-
-You need to enable forwarder gwtraf sending data to the OLED listener (we use port 1688), for this, set `serv_enabled` to `true` on the server section for server gwtraf as follow
-`/opt/loragw/global_conf.json` 
-```json
-{
-  "server_address": "127.0.0.1",
-  "serv_type": "gwtraf",
-  "serv_port_up": 1688,
-  "serv_port_down": 1689,
-  "serv_enabled": true     # <== CHANGE_HERE, set to true
-}
+### Build examples (recommend to skip this section)
+But if you want to run all examples, which I do not recommand because it takes SD space and very long time to install, type the following
+``` 
+sudo apt install libsdl-dev libportmidi-dev libsdl-ttf2.0-dev libsdl-mixer1.2-dev libsdl-image1.2-dev
+sudo pip install --upgrade setuptools
+cd luma.examples
+sudo -H pip install -e .
 ```
 
 ## Configure OLED 
