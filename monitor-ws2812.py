@@ -13,6 +13,8 @@
 #
 # All text above must be included in any redistribution.
 #
+# Poor code, written in a hurry, need optimization and rewrite for sure
+#
 # **********************************************************************************
 
 import RPi.GPIO as GPIO
@@ -25,18 +27,17 @@ import sys
 import signal
 import subprocess
 
-# Switch push button
-gpio_pin = 17
-gpio_led = 18
+gpio_pin = 17 # Switch push button pin
+gpio_led = 18 # WS2812 led pin
 
-internet = False
-localnet = False
-lorawan  = False
-web      = False
+internet = False # True if internet connected
+lorawan  = False # True if local LoraWan server is running
+web      = False # True if local Web Server is running
 
-hostapd  = False
-pktfwd   = False
+hostapd  = False # True if wifi access point is started
+pktfwd   = False # True if packet forwarder is started
 
+# LED color definition
 color_off = Color(0,0,0)
 color_red = Color(128,0,0)
 color_grn = Color(0,128,0)
@@ -49,6 +50,7 @@ def signal_handler(signal, frame):
     sys.exit(0)
 
 
+# Check if a process is running
 def check_process(process):
   proc = subprocess.Popen(["if pgrep " + process + " >/dev/null 2>&1; then echo '1'; else echo '0'; fi"], stdout=subprocess.PIPE, shell=True)
   (ret, err) = proc.communicate()
@@ -59,9 +61,9 @@ def check_process(process):
   else:
     return False
 
+# Check internet connected
 def check_inet(delay):
   global internet
-  global localnet
   global lorawan
   global web
   global hostapd
@@ -76,6 +78,7 @@ def check_inet(delay):
     except:
       internet = False
 
+    # Check local Web Server (if any)
     try:
       url = "http://127.0.0.1"
       urllib.urlopen(url)
@@ -83,6 +86,7 @@ def check_inet(delay):
     except:
       web = False
 
+    # Check local LoRaWAN server (if any)
     try:
       url = "http://127.0.0.1:8080"
       urllib.urlopen(url)
@@ -90,6 +94,7 @@ def check_inet(delay):
     except:
       lorawan = False
 
+    # Check WiFi AP mode and packet forwarder
     hostapd = check_process("hostapd")
     pktfwd = check_process("mp_pkt_fwd")
 
@@ -97,7 +102,7 @@ def check_inet(delay):
 
 
 # Use the Broadcom SOC Pin numbers
-# Setup the Pin with Internal pullups enabled and PIN in reading mode.
+# Setup the Switch pin with pulldown enabled and PIN in input
 GPIO.setwarnings(False)
 GPIO.setmode(GPIO.BCM)
 GPIO.setup(gpio_pin, GPIO.IN, pull_up_down = GPIO.PUD_DOWN)
@@ -110,13 +115,16 @@ def colorSet(strip, led, color):
 
 # Our function on what to do when the button is pressed
 def checkShutdown():
+    # Button pressed light LED1 in RED
     if GPIO.input(gpio_pin) == 1:
       colorSet(strip, 0, color_red)
       colorSet(strip, 1, color_off)
       time.sleep(.9)
+      # Still pressed after 900ms light LED2 in RED
       if GPIO.input(gpio_pin) == 1:
         colorSet(strip, 1, color_red)
         time.sleep(.9)
+        # Still pressed after 900ms more, blink blue 10 times
         if GPIO.input(gpio_pin) == 1:
           for x in range(0, 10):
             colorSet(strip, 0, color_blu)
@@ -126,7 +134,9 @@ def checkShutdown():
             colorSet(strip, 1, color_off)
             time.sleep(.4)
           print "shutdown"
-          os.system("sudo halt &")
+          # start the poweroff process in background
+          os.system("sudo poweroff &")
+          # prevent this script to continue
           time.sleep(30)
 
 signal.signal(signal.SIGINT, signal_handler)
@@ -137,12 +147,13 @@ strip = Adafruit_NeoPixel(2, gpio_led, 800000, 5, False, 64, 0, ws.WS2811_STRIP_
 # Intialize the library (must be called once before other functions).
 strip.begin()
 
+# Check connection/process every 5 seconds
 try:
    thread.start_new_thread( check_inet, (5, ) )
 except:
    print "Error: unable to start thread"
 
-# Now wait!
+# Now wait in infinite loop
 while 1:
     led0 = color_red
     led1 = color_red
@@ -153,11 +164,12 @@ while 1:
       if hostapd == True:
         led0 = color_blu
 
-#    if web == True and lorawan == True:
+#    if  pktfwd == True and web == True and lorawan == True:
     if pktfwd == True :
       led1 = color_grn
     else:
-      led1 = color_red
+      if lorawan == True:
+        led0 = color_blu
 
     colorSet(strip, 0, led0)
     time.sleep(.2)
