@@ -59,6 +59,7 @@ sudo -H pip install --upgrade luma.oled
 
 ### Install examples 
 ``` 
+sudo pip install --upgrade setuptools
 git clone https://github.com/rm-hull/luma.examples.git
 cd luma.examples
 sudo -H pip install -e .
@@ -72,69 +73,17 @@ sudo cp ~/luma.examples/examples/fonts/*.ttf /usr/share/fonts/truetype/luma/
 
 ## Configure forwarder to send stats to OLED process
 
-You need to send data to the listener (we use port 1688), for this we add a gwtraf server into the servers options in file 
-`/opt/loragw/local_conf.json` 
+You need to enable forwarder gwtraf sending data to the OLED listener (we use port 1688), for this, set `serv_enabled` to `true` on the server section for server gwtraf as follow
+`/opt/loragw/global_conf.json` 
 ```json
 {
   "server_address": "127.0.0.1",
   "serv_type": "gwtraf",
   "serv_port_up": 1688,
   "serv_port_down": 1689,
-  "serv_enabled": true
+  "serv_enabled": true     # <== CHANGE_HERE, set to true
 }
 ```
-
-for example my full `/opt/loragw/local_conf.json` is configured with 3 Gateways as follow
-
- - 1 for TTN (here disabled)
- - 1 for gw traffic monitoring on OLED
- - 1 for local backend LoRaWAN server
-
-You can enable/disable each server with key `serv_enabled` set to `true` or `false`
-
-```json
-{
-  "gateway_conf": {
-    "gateway_ID": "B827EBFFFED41691",
-    "description": "CH2i TTN GW For testing  purpose",
-    "servers": [
-      {
-        "server_address": "bridge.eu.thethings.network",
-        "serv_gw_id": "YOUR_GW_ID",
-        "serv_type": "ttn",
-        "serv_gw_key": "ttn-account-v2.YOUR_ACCOUNT_KEY",
-        "serv_enabled": false
-      },
-
-
-      {
-        "server_address": "127.0.0.1",
-        "serv_type": "gwtraf",
-        "serv_port_up": 1688,
-        "serv_port_down": 1689,
-        "serv_enabled": true
-      },
-
-      {
-        "server_address": "127.0.0.1",
-        "serv_port_up": 1680,
-        "serv_port_down": 1680,
-        "serv_enabled": true
-      }
-    ],
-
-    "keepalive_interval": 10,
-    "stat_interval": 30,
-    "push_timeout_ms": 100,
-    "forward_crc_valid": true,
-    "forward_crc_error": false,
-    "forward_crc_disabled": false,
-
-    "contact_email": "contact@ch2i.eu"
-  }
-}
-```
-
 
 ## Configure OLED 
 
@@ -156,7 +105,7 @@ The i2c adress can be seen with `i2cdetect -y 1`
 70: -- -- -- -- -- -- -- --
 ```
 
-Mine is SH1106 with 0x3c address so my config is 
+Mine is 1.3" SH1106 with 0x3c address so my config is 
 ```python
 serial = i2c(port=1, address=0x3c)
 device = sh1106(serial)
@@ -186,8 +135,8 @@ if for example it's running from RPI 3 with eth0 code could be
 draw.text((col1, line1),"Host :%s" % socket.gethostname(), font=font10, fill=255)
 draw.text((col1, line2), lan_ip("eth0"),  font=font10, fill=255)
 draw.text((col1, line3), network("eth0"),  font=font10, fill=255)
-#draw.text((col1, line4), lan_ip("uap0"),  font=font10, fill=255)
-#draw.text((col1, line5), network("uap0"),  font=font10, fill=255)
+draw.text((col1, line4), lan_ip("wlan0"),  font=font10, fill=255)
+draw.text((col1, line5), network("wlan0"),  font=font10, fill=255)
 ```
 
 
