@@ -63,10 +63,10 @@ sudo cp ./oled.service /lib/systemd/system/
 echo ""
 echo "You can enable monitor service that manage blinking led to"
 echo "display status and also add button management to shutdown PI"
-echo -n "Would you like to enable this [Y/n]:"
+echo -n "Would you like to enable this [y/N]:"
 read rep
 
-if [[ "$rep" == "Y" ]]; then
+if [[ "$rep" == "y" ]]; then
   sudo systemctl enable monitor.service
   sudo systemctl start monitor.service
   echo "monitor service enabled!"
@@ -74,10 +74,10 @@ fi
 
 echo ""
 echo "You can enable OLED display service to show informations"
-echo -n "Would you like to enable this [Y/n]:"
+echo -n "Would you like to enable this [y/N]:"
 read rep
 
-if [[ "$rep" == "Y" ]]; then
+if [[ "$rep" == "y" ]]; then
   sudo systemctl enable oled.service
   sudo systemctl start oled.service
   echo "Oled service enabled!"
