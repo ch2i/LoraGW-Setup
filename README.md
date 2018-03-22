@@ -372,6 +372,7 @@ Jan 22 01:01:11 loragw loragw[240]: 01:01:11  INFO: [TTN] send status success fo
 # And here is the final result
 
 Click on image to see the video
+
 [![CH2i RAK831 GW](http://img.youtube.com/vi/AZTomPGSOBY/0.jpg)](https://www.youtube.com/watch?v=AZTomPGSOBY "CH2i RAK831 GW")
 
 # Add some other features
