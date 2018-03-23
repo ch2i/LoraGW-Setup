@@ -124,12 +124,7 @@ sudo raspi-config
   - advanced options, expand filesystem
   - advanced options, reduce video memory split set to 16M
 
-then *reboot* when asked.
-
-log back with `loragw` user and if you changed hostname to loragw, use this command
-```shell
-ssh loragw@loragw.local
-``` 
+then do not when asked.
 
 ## Optionnal, Install log2ram this will preserve your SD card
 ```shell
@@ -140,15 +135,21 @@ sudo ./install.sh
 sudo ln -s /usr/local/bin/ram2disk /etc/cron.hourly/
 ```
 
-Reboot to activate it if installed
+
+## Now reboot
+
+**Reboot**
 ```shell
 sudo reboot
 ```
 
-## Get CH2i Gateway Install repository
+## Reconnect after reboot
+
+Log back with `loragw` user and if you changed hostname to loragw, use this command
+```shell
+ssh loragw@loragw.local
 ``` 
-git clone https://github.com/ch2i/LoraGW-Setup
-```
+
 
 ## Install nodejs
 
@@ -159,7 +160,7 @@ sudo wget -O - https://raw.githubusercontent.com/sdesalas/node-pi-zero/master/in
 
 this will fire some error on unlink, but don't worry, that's ok because it's the first install.
 
-Add the following to the end of your ~/.profile file:
+Add the following to the end of your `~/.profile` file with `nano ~/.profile`
 ``` 
 export PATH=$PATH:/opt/nodejs/bin
 export NODE_PATH=/opt/nodejs/lib/node_modules
@@ -215,26 +216,28 @@ sudo npm install -g --unsafe-perm rpi-ws281x-native
 npm link rpi-ws281x-native
 ``` 
 
-
-### Test WS2812 LED if you have any, in python or nodejs
-Check that led color match the color displayed on console because on some WS2812B led, Red and Green could be reversed.
-``` 
-cd ~/LoraGW-Setup
-sudo ./testled.py
-sudo ./testled.js
-``` 
-
 ## Install Python I2C/SPI OLED library (if you want to use OLED dispay)
 
 Optionnaly you can add OLED to display usefull informations on it. Please look at this [documentation](https://github.com/ch2i/LoraGW-Setup/blob/master/doc/DisplayOled.md) for more informations
 
+## Get CH2i Gateway Install repository
+``` 
+git clone https://github.com/ch2i/LoraGW-Setup
+```
+
+### Test WS2812 LED if you have any, in python or nodejs
+Check that led color match the color displayed on console because on some WS2812B led, Red and Green could be reversed.
+``` 
+cd LoraGW-Setup
+sudo ./testled.py
+sudo ./testled.js
+``` 
 
 ## Build and setup Packet Forwarder
 
 New Multi-protocol Packet Forwarder by Jac @Kersing (thanks to @jpmeijers for scripting stuff)
 Now build the whole thing, time to get a(nother) coffe, it can take 10/15 minutes!
 ``` 
-cd ~/LoraGW-Setup
 sudo ./build.sh
 ``` 
 
