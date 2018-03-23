@@ -82,7 +82,7 @@ sudo -H pip install -e .
 
 ### Configure OLED Hardware
 
-You may need to change the following line in `/opt/loragw/oled.py` according to the connected OLED type and it I2C address.
+You may need to change the following line in `oled.py` according to the connected OLED type and it I2C address.
 
 The i2c adress can be seen with `i2cdetect -y 1`
 
@@ -98,6 +98,8 @@ The i2c adress can be seen with `i2cdetect -y 1`
 70: -- -- -- -- -- -- -- --
 ```
 
+If you already installed all the Gateway software it's located in `/opt/loragw/oled.py` else in `~/LoraGW-Setup/oled.py`
+
 Mine is 1.3" SH1106 with 0x3c address so my config is 
 ```python
 serial = i2c(port=1, address=0x3c)
@@ -109,6 +111,12 @@ But as an example, for SSD1306 oled with address 0x3d
 serial = i2c(port=1, address=0x3d)
 device = ssd1306(serial)
 ```
+
+Then you can check OLED display with, shold display something
+```
+./oled.py
+```
+
 
 ### Configure OLED software
 
