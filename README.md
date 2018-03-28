@@ -325,7 +325,7 @@ sudo systemctl stop monitor
 
 ### If you have ic880a shield, change monitor service
 
-In this case you do not have WS2812B RGB LED on the shield, but GPIO classic one. You need to setup the correct monitor service.
+In this case you do not have WS2812B RGB LED on the shield, but GPIO classic one. The push button GPIO to power off the PI is also not on the same GPIO, so you need to setup the correct monitor service.
 
 ```shell
 sudo rm /opt/loragw/monitor.py
