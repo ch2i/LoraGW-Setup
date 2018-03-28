@@ -1,9 +1,13 @@
 # Lora Gateway base setup for SX1301 based concentrators
 
 This setup is used for some LoraWAN concentrators based on small computers such as Raspberry PI or others. 
-For example it works fine with the RAK831 PI Zero [shield](https://github.com/hallard/RAK831-Zero)
+For example it works fine with the RAK831 PI Zero [shield](https://github.com/hallard/RAK831-Zero) 
 
-<img src="https://raw.githubusercontent.com/hallard/RAK831-Zero/master/pictures/PiZero-RAK831-finished.jpg" alt="Full">     
+<img src="https://raw.githubusercontent.com/hallard/RAK831-Zero/master/pictures/PiZero-RAK831-finished.jpg" alt="RAK831 Shield">     
+
+And for the [iC880a](https://github.com/ch2i/iC880A-Raspberry-PI) sield for Raspberry PI V2 or V3.
+
+<img src="https://raw.githubusercontent.com/ch2i/iC880A-Raspberry-PI/master/pictures/ic880a-mounted-V12.jpg" alt="iC880a Shield">     
 
 # Installation
 
@@ -283,6 +287,8 @@ You can change LED code behaviour at the end of script `/opt/loragw/monitor.py`
 ## Shutdown
 You can press (and let it pressed) the switch push button, leds well become RED and after 2s start blinking in blue. If you release button when they blink blue, the Pi will initiate a shutdown. So let it 30s before removing power.
 
+### Shutdown LED display (for iC880a only)
+
 If you have a raspberry PI with this [IC880A shield](https://github.com/ch2i/iC880A-Raspberry-PI), and if you modded the `/boot/config.txt` file with following lines added into:
 
 ```
@@ -317,7 +323,10 @@ There are 2 versions of this service (with symlink), one with WS2812B led and an
 sudo systemctl stop monitor
 ```
 
-### change the link (were with GPIO version)
+### If you have ic880a shield, change monitor service
+
+In this case you do not have WS2812B RGB LED on the shield, but GPIO classic one. You need to setup the correct monitor service.
+
 ```shell
 sudo rm /opt/loragw/monitor.py
 sudo ln -s /opt/loragw/monitor-gpio.py /opt/loragw/monitor.py
