@@ -265,7 +265,7 @@ Check all is fine also at startup, reboot your gateway.
 sudo reboot
 ``` 
 
-## LED Blinking colors
+## LED Blinking colors (RAK831 Shied with 2 WS2812B Leds)
 
 ### LED 1
 
@@ -278,6 +278,19 @@ sudo reboot
 - green => packet forwarder is started and running
 - blue  => no packed forwarder but local [LoRaWAN server](https://github.com/ch2i/LoraGW-Setup/blob/master/doc/Lorawan-Server.md) is started
 - red => No packet forwarder nor LoRaWAN server
+
+## LED Blinking colors (iC880a with 4 GPIO Leds)
+
+	- GPIO 4  (Blue) Blink => Internet access OK
+	- GPIO 18 (Yellow) Blink => local web server up & running
+	- GPIO 24 (Green)
+		- Blink => packet forwarder is running
+		- Fixed => Shutdown OK, can remove power
+	- GPIO 23 (Red) 
+		- Blink every second, one of the previous service down (local web, internet, )
+	  - Middle bink on every bad LoRaWAN packet received
+	  - Lot of short blink => Activity on SD Card (seen a boot for example)
+
 
 ### Change behaviour
 
