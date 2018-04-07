@@ -31,11 +31,12 @@ gpio_yel = 18
 gpio_red = 23
 gpio_grn = 24
 
-internet = False
-localnet = False
-lorawan  = False
-web      = False
-hostapd  = False
+internet = False # True if internet connected
+lorawan  = False # True if local LoraWan server is running
+web      = False # True if local Web Server is running
+hostapd  = False # True if wifi access point is started
+pktfwd   = False # True if packet forwarder is started
+
 
 def signal_handler(signal, frame):
     GPIO.output(gpio_blu, GPIO.LOW)
@@ -49,7 +50,7 @@ def check_process(process):
   proc = subprocess.Popen(["if pgrep " + process + " >/dev/null 2>&1; then echo '1'; else echo '0'; fi"], stdout=subprocess.PIPE, shell=True)
   (ret, err) = proc.communicate()
   ret = int(ret)
-  print ret
+#  print ret
   if ret==1:
     return True
   else:
@@ -57,10 +58,10 @@ def check_process(process):
 
 def check_inet(delay):
   global internet
-  global localnet
   global lorawan
   global web
   global hostapd
+  global pktfwd
 
   while True:
     #print "check Internet"
@@ -85,10 +86,11 @@ def check_inet(delay):
     except:
       lorawan = False
 
-    hostapd = check_process("hostapd")
+    # Check WiFi AP mode and packet forwarder
+    #hostapd = check_process("hostapd")
+    pktfwd = check_process("mp_pkt_fwd")
 
     time.sleep(delay)
-
 
 # Use the Broadcom SOC Pin numbers
 # Setup the Pin with Internal pullups enabled and PIN in reading mode.
@@ -150,7 +152,7 @@ while 1:
     led_red = GPIO.LOW
     led_grn = GPIO.LOW
 
-    if hostapd == True:
+    if internet == True:
       led_blu = GPIO.HIGH
     else:
       led_red = GPIO.HIGH
@@ -160,7 +162,7 @@ while 1:
     else:
       led_red = GPIO.HIGH
 
-    if lorawan == True:
+    if pktfwd == True:
       led_grn = GPIO.HIGH
     else:
       led_red = GPIO.HIGH
