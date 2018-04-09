@@ -38,7 +38,7 @@ if [[ $GW_RESET_PIN == "" ]]; then
 fi
 
 # Set the reset în in startup shell
-sudo sed -i -- "s/RESET_BCM_PIN=[0-9]+/RESET_BCM_PIN=$GW_RESET_PIN/g" ./start.sh
+sudo sed -i -- "s/RESET_BCM_PIN=25/RESET_BCM_PIN=$GW_RESET_PIN/g" ./start.sh
 
 # script to get config from TTN server
 python set_config.py
