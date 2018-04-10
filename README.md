@@ -274,6 +274,13 @@ Now build the whole thing, time to get a(nother) coffe, it can take 10/15 minute
 sudo ./build.sh
 ``` 
 
+## Build and setup legacy Packet Forwarder (optionnal)
+
+If you really want to use the legacy packet forwarder you can launch this script. Both can be compiled on the same target, no problem, see below how to setup the legacy
+``` 
+sudo ./build_legacy.sh
+``` 
+
 ## Configure Gateway on TTN console
 
 Now you need to register your new GW on ttn before next step, see [gateway registration](https://www.thethingsnetwork.org/docs/gateways/registration.html#via-gateway-connector), fill the GW_ID and GW_KEY when running
@@ -342,10 +349,9 @@ then the Green LED (gpio24) will stay on when you can remove the power of the ga
 You can also select which GPIO LED is used to replace activity LED if you need it.
 ```
 # Activity LED
-dtoverlay=gpio-poweroff,gpiopin=23
+dtoverlay=pi3-act-led,gpio=23
 ```
 then the Red LED (gpio23) will blink on activity.
-
 
 ## Detailled information
 
@@ -428,6 +434,24 @@ Jan 22 01:01:11 loragw loragw[240]: # Semtech status report send.
 Jan 22 01:01:11 loragw loragw[240]: ##### END #####
 Jan 22 01:01:11 loragw loragw[240]: 01:01:11  INFO: [TTN] bridge.eu.thethings.network RTT 53
 Jan 22 01:01:11 loragw loragw[240]: 01:01:11  INFO: [TTN] send status success for bridge.eu.thethings.network
+```
+
+
+### Use legacy Packet Forwarder
+
+If you want to use the legacy packet forwarder, you'll need to change file `/opt/loragw/start.sh` to replace the last line
+
+```
+./mp_pkt_fwd.sh
+``` 
+by
+```
+./poly_pkt_fwd.sh
+``` 
+
+```shell
+sudo systemctl stop loragw
+sudo systemctl start loragw
 ```
 
 
