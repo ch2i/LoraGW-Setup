@@ -1,0 +1,23 @@
+# Enable the service
+# systemctl enable sensors-js.service
+#
+# Start the service
+# systemctl start sensors-js.service
+#
+# Verify it is running
+# systemctl status sensors-js.service
+
+
+[Unit]
+Description=CH2i Lora Gateway Sensors service
+
+[Service]
+ExecStart=/usr/bin/node /opt/loragw/sensors.js
+Restart=always
+RestartSec=30                       
+StandardOutput=syslog
+StandardError=syslog
+SyslogIdentifier=sensors-js
+
+[Install]
+WantedBy=multi-user.target
