@@ -85,6 +85,35 @@ sudo apt-get update && sudo apt-get upgrade
 sudo apt-get install git-core build-essential ntp scons python-dev swig python-psutil
 ``` 
 
+If the 2nd command fire the following error (always happen with latest rasbian because it updates kernel and co) 
+then just **reboot** and restart the 2 commands above.
+
+```
+Reading package lists... Done
+Building dependency tree
+Reading state information... Done
+Package python-psutil is not available, but is referred to by another package.
+This may mean that the package is missing, has been obsoleted, or
+is only available from another source
+
+Package ntp is not available, but is referred to by another package.
+This may mean that the package is missing, has been obsoleted, or
+is only available from another source
+
+Package python-dev is not available, but is referred to by another package.
+This may mean that the package is missing, has been obsoleted, or
+is only available from another source
+However the following packages replace it:
+  python
+
+E: Unable to locate package git-core
+E: Package 'ntp' has no installation candidate
+E: Unable to locate package scons
+E: Package 'python-dev' has no installation candidate
+E: Unable to locate package swig
+E: Package 'python-psutil' has no installation candidate
+```
+
 ## Create a new user account (loragw).
 
 This `loragw` account will be used instead of default existing `pi` account for security reasons.
@@ -183,14 +212,14 @@ sudo apt-get install nodejs
 ``` 
 
 
-## Install WS2812 driver for onboard LED
+## Install WS2812 driver for onboard LED (for RAK831 shield only)
 
 The onboard WS2812 library and the Raspberry Pi audio both use the PWM, they cannot be used together. You will need to blacklist the Broadcom audio kernel module by editing a file 
 ``` 
 echo "blacklist snd_bcm2835" | sudo tee --append /etc/modprobe.d/snd-blacklist.conf
 ``` 
 
-### Install WS2812 led driver
+### Install WS2812 led driver (for RAK831 shield only)
 ``` 
 git clone https://github.com/jgarff/rpi_ws281x
 cd rpi_ws281x/
@@ -202,18 +231,18 @@ sudo cp rpihw.h /usr/local/include/
 sudo cp pwm.h /usr/local/include/
 ``` 
 
-### Install WS2812 python wrapper
+### Install WS2812 python wrapper (for RAK831 shield only)
 ``` 
 cd python
 python ./setup.py build
 ``` 
 
-### Install WS2812 python library
+### Install WS2812 python library (for RAK831 shield only)
 ``` 
 sudo python setup.py install
 ``` 
 
-### Install NodeJS version of WS2812 driver
+### Install NodeJS version of WS2812 driver (for RAK831 shield only)
 ``` 
 cd
 sudo npm install -g --unsafe-perm rpi-ws281x-native
@@ -243,6 +272,13 @@ New Multi-protocol Packet Forwarder by Jac @Kersing (thanks to @jpmeijers for sc
 Now build the whole thing, time to get a(nother) coffe, it can take 10/15 minutes!
 ``` 
 sudo ./build.sh
+``` 
+
+## Build and setup legacy Packet Forwarder (optionnal)
+
+If you really want to use the legacy packet forwarder you can launch this script. Both can be compiled on the same target, no problem, see below how to setup the legacy
+``` 
+sudo ./build_legacy.sh
 ``` 
 
 ## Configure Gateway on TTN console
@@ -309,6 +345,13 @@ If you have a raspberry PI with this [IC880A shield](https://github.com/ch2i/iC8
 dtoverlay=gpio-poweroff,gpiopin=24
 ```
 then the Green LED (gpio24) will stay on when you can remove the power of the gateway. It's really a great indicator.
+
+You can also select which GPIO LED is used to replace activity LED if you need it.
+```
+# Activity LED
+dtoverlay=pi3-act-led,gpio=23
+```
+then the Red LED (gpio23) will blink on activity.
 
 ## Detailled information
 
@@ -391,6 +434,24 @@ Jan 22 01:01:11 loragw loragw[240]: # Semtech status report send.
 Jan 22 01:01:11 loragw loragw[240]: ##### END #####
 Jan 22 01:01:11 loragw loragw[240]: 01:01:11  INFO: [TTN] bridge.eu.thethings.network RTT 53
 Jan 22 01:01:11 loragw loragw[240]: 01:01:11  INFO: [TTN] send status success for bridge.eu.thethings.network
+```
+
+
+### Use legacy Packet Forwarder
+
+If you want to use the legacy packet forwarder, you'll need to change file `/opt/loragw/start.sh` to replace the last line
+
+```
+./mp_pkt_fwd.sh
+``` 
+by
+```
+./poly_pkt_fwd.sh
+``` 
+
+```shell
+sudo systemctl stop loragw
+sudo systemctl start loragw
 ```
 
 
