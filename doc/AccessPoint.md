@@ -1,221 +1,157 @@
 # Promote Raspberry PI based gateway as a WiFi access point
 
-The following procedure is used for reference or for testing. Since months, I'm using excellent [RaspAP-webgui](https://github.com/billz/raspap-webgui) to make access point.
+ I found several method to got this working but despite my best efforts, I was unable to get any of those tutorials to work reliably on their own until I found this article. The procedure here works with Raspberry **PI Zero W and Debian Stretch**.
 
-I'm installing it with the quick installer [method](https://github.com/billz/raspap-webgui#quick-installer) but as I've specific devices, I'm changing default IP network before reboot by
+ It may work (or not) with other PI model or OS version.
 
-### in `/etc/dhcpcd.conf`
-```
-static ip_address=192.168.50.1/24
-static routers=192.168.50.1
-static domain_name_server=8.8.8.8 8.8.4.4
-```
+I copied the procedure from [original article](https://albeec13.github.io/2017/09/26/raspberry-pi-zero-w-simultaneous-ap-and-managed-mode-wifi/) to have a backup in case and also to adapt to my needs.
 
-### in `/etc/dnsmasq.conf`
-```
-interface=wlan0
-dhcp-range=192.168.50.50,192.168.50.100,255.255.255.0,12h
-```
+Other solutions I tried with mitigated success on PI Zero is excellent [RaspAP-webgui](https://github.com/billz/raspap-webgui) to make access point. It may works perfecttly for RPI 3 but still issues with PI Zero.
 
-After that my AP is 192.168.50.1 and distributing address from `192.168.50.50` to `192.168.50.100`
+# Pi Zero W with Raspbian Stretch Procedure
 
-Also you can uncomment dedicated RPI 3 Wifi config (works for PI Zero W)
+## Create new network interface for Access Point (ap0)
+
+Create/edit the file `/etc/udev/rules.d/90-wireless.rules`, and add the following line.
+
 ```
+ACTION=="add|change", SUBSYSTEM=="ieee80211", KERNEL=="phy0", RUN+="/sbin/iw phy %k interface add ap0 type __ap"
 ```
 
-
-**The following part is depreceated**
 
 ## Install the packages you need for DNS, Access Point and Firewall rules.
 ```
 sudo apt-get install hostapd dnsmasq iptables-persistent
 ```
 
-## create RAM filesystem (I'm using Read Only Filesystem)
-```
-sudo mkdir /var/dnsmasq
-sudo mkdir /mnt/ramdisk
-```
+## Configure the DNS server
 
-## Add this to /etc/fstab
-```
-tmpfs   /mnt/ramdisk    tmpfs   defaults,size=16M       0       0
-tmpfs   /var/dnsmasq    tmpfs   nosuid,nodev            0       0
-```
+Edit the file `/etc/dnsmasq.conf` that should be like that, I kept the comments has a reminder to activate some features
 
-```shell
-sudo cp /etc/resolv.conf /tmp/resolv.conf
-sudo rm /etc/resolv.conf
-sudo ln -s /tmp/resolv.conf /etc/resolv.conf
-#sudo ln -s /tmp/dhcpcd.resolv.conf /etc/resolv.conf
 ```
-
-
-## just in case, save old dnsmasq.conf
-```shell
-sudo cp /etc/dnsmasq.conf /etc/dnsmasq.conf.org
-```
-
-## /etc/dnsmasq.conf
-```
-interface=lo,uap0
+interface=lo,ap0
 no-dhcp-interface=lo,wlan0
 bind-interfaces
 server=8.8.8.8
 domain-needed
 bogus-priv
-dhcp-range=192.168.50.50,192.168.50.150,12h
-dhcp-leasefile=/var/dnsmasq/dnsmasq.leases
+dhcp-range=192.168.50.50,192.168.50.100,12h
 
+#dhcp-leasefile=/tmp/dnsmasq.leases
 #address=/*.apple.com/192.168.50.1
 #address=/*.icloud.com/192.168.50.1
 #address=/#/192.168.50.1
 
 ###### logging ############
 # own logfile
-log-facility=/var/log/dnsmasq.log
+#log-facility=/var/log/dnsmasq.log
 # log-async
 # log dhcp infos
 #log-dhcp
 # debugging dns
-log-queries
-
-
 ```
 
+After that my AP is distributing address from `192.168.50.50` to `192.168.50.100`
 
-## /etc/hostapd/hostapd.conf
+## Setup the Access Point configuration
+
+### Edit the file `/etc/hostapd/hostapd.conf` that should be like that
+
 ```
-interface=uap0
+ctrl_interface=/var/run/hostapd
+ctrl_interface_group=0
+interface=ap0
+driver=nl80211
 ssid=_AP_SSID_
 hw_mode=g
-channel=6
+channel=9
+wmm_enabled=0
 macaddr_acl=0
 auth_algs=1
-ignore_broadcast_ssid=0
 wpa=2
 wpa_passphrase=_AP_PASSWORD_
 wpa_key_mgmt=WPA-PSK
-wpa_pairwise=TKIP
+wpa_pairwise=TKIP CCMP
 rsn_pairwise=CCMP
+country_code=FR
 ```
 
-Replace `_AP_SSID_` with the SSID you want for your access point.  Replace `_AP_PASSWORD_` with the password for your access point.  Make sure it has
-enough characters to be a legal password!  (8 characters minimum).
+Replace `_AP_SSID_` with the SSID you want for your access point. Replace `_AP_PASSWORD_` with the password for your access point. Make sure it has enough characters to be a legal password! (8 characters minimum) else hostapd won't start.
 
-## /etc/default/hostapd
+Change also `country_code` to your own country
+
+### Edit the file `/etc/hostapd/hostapd.conf` to enable service to start correctly
+
 ```
+#DAEMON_OPTS=" -f /tmp/hostapd.log"
 DAEMON_CONF="/etc/hostapd/hostapd.conf"
-```
-
-
-# On Debian Jessie
-http://imti.co/post/145442415333/raspberry-pi-3-wifi-station-ap
-
-## /etc/network/interfaces
-```
-auto uap0
-iface uap0 inet static
-  address 192.168.50.1
-  netmask 255.255.255.0
-  network 192.168.50.0
-  broadcast 192.168.50.255
-  gateway 192.168.50.1
-  metric 9999
-```
-
-
-## /etc/init.d/hostapd
-```
-  start)
-
-        iw dev wlan0 interface add uap0 type __ap
-        service dnsmasq restart
-        sysctl net.ipv4.ip_forward=1
-        iptables -t nat -A POSTROUTING -s 192.168.50.0/24 ! -d 192.168.50.0/24 -j MASQUERADE
-        ifup uap0
-        log_daemon_msg "Starting $DESC" "$NAME"
-        start-stop-daemon --start --oknodo --quiet --exec "$DAEMON_SBIN" \
-                --pidfile "$PIDFILE" -- $DAEMON_OPTS >/dev/null
-        log_end_msg "$?"
-        ;;
-
-```
-
-
-# On Debian stretch
-
-https://github.com/peebles/rpi3-wifi-station-ap-stretch
-
-## /etc/network/interfaces.d/ap
-```
-allow-hotplug uap0
-auto uap0
-iface uap0 inet static
-  address 192.168.50.1
-  netmask 255.255.255.0
-  metric 9999
-
-```
-
-## /etc/network/interfaces.d/station
-```
-allow-hotplug wlan0
-iface wlan0 inet manual
-  wpa-conf /etc/wpa_supplicant/wpa_supplicant.conf
-
-```
-
-
-## /etc/udev/rules.d/90-wireless.rules 
-```
-ACTION=="add", SUBSYSTEM=="ieee80211", KERNEL=="phy0", RUN+="/sbin/iw phy %k interface add uap0 type __ap"
-```
-
-## Do not let DHCPCD manage wpa_supplicant!!
-```shell
-sudo rm -f /lib/dhcpcd/dhcpcd-hooks/10-wpa_supplicant
 ```
 
 ## Set up the client wifi (station) on wlan0.
 
-Create or edit `/etc/wpa_supplicant/wpa_supplicant.conf`. The contents depend on whether your home network is open, WEP or WPA.  It is
-probably WPA, and so should look like:
+Create or edit `/etc/wpa_supplicant/wpa_supplicant.conf`. The contents depend on whether your home network is open, WEP or WPA/2.  It is
+probably WPA2, and so should look like:
 
 ```
+    country=FR
     ctrl_interface=DIR=/var/run/wpa_supplicant GROUP=netdev
-    country=GB
-    
+    update_config=1    
+
     network={
       ssid="_ST_SSID_"
-      scan_ssid=1
       psk="_ST_PASSWORD_"
-      key_mgmt=WPA-PSK
+      id_str="_MYAP_"
     }
+
 ```
 
-Replace `_ST_SSID_` with your home network SSID and `_ST_PASSWORD_` with your wifi password (in clear text).
+Replace `_ST_SSID_` with your router SSID and `_ST_PASSWORD_` with your wifi password (in clear text). 
+id_str is a name you'll need later, replace `_MYAP_` by the logical name you want.
+
+Change also `country` to your own country
 
 
-## Permanently deal with interface bringup order
+## Set up the network inferfaces
 
-see this [issue](https://unix.stackexchange.com/questions/396059/unable-to-establish-connection-with-mlme-connect-failed-ret-1-operation-not-p)
-  
+Edit the file  `/etc/network/interfaces`. Mine looks like that:
+
+```
+# Include files from /etc/network/interfaces.d:
+source-directory /etc/network/interfaces.d
+
+auto lo
+auto ap0
+auto wlan0
+iface lo inet loopback
+
+allow-hotplug wlan0
+iface wlan0 inet manual
+    wpa-roam /etc/wpa_supplicant/wpa_supplicant.conf
+iface _MYAP_ inet dhcp
+
+allow-hotplug ap0
+iface ap0 inet static
+    address 192.168.50.1
+    netmask 255.255.255.0
+    hostapd /etc/hostapd/hostapd.conf
+```
+
+Replace `_MYAP_` with the logical name you put in the file `wpa_supplicant.conf`
+
+## Set up boot order and/or workaround
+
+Make sure do disable dhcpcd with 
+```shell
+sudo update-rc.d dhcpcd disable
+```
+
 Edit `/etc/rc.local` and add the following lines just before `exit 0`
-```shell
-sleep 5
-ifdown wlan0
-sleep 2
-rm -f /var/run/wpa_supplicant/wlan0
-ifup wlan0
-```
 
-## Bridge AP to cient side
 ```shell
-sudo sh -c 'echo "net.ipv4.ip_forward=1" >> /etc/sysctl.conf'
-sudo sh -c 'echo 1 > /proc/sys/net/ipv4/ip_forward'
-sudo iptables -t nat -A POSTROUTING -s 192.168.50.0/24 ! -d 192.168.50.0/24 -j MASQUERADE
-sudo sudo sh -c 'iptables-save > /etc/iptables/rules.v4'
+ifdown --force wlan0 && ifdown --force ap0 && ifup ap0 && ifup wlan0
+sysctl -w net.ipv4.ip_forward=1
+iptables -t nat -A POSTROUTING -s 192.168.50.0/24 ! -d 192.168.50.0/24 -j MASQUERADE
+systemctl restart dnsmasq
 ```
 
 
