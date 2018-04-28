@@ -203,13 +203,14 @@ if [[ $BOARD_TARGET == 2 ]]; then
   cd python
   python ./setup.py build
   python setup.py install
-  cd
+  cd /home/loragw/
   npm install -g --unsafe-perm rpi-ws281x-native
   npm link rpi-ws281x-native
 fi
 
 if [[ "$EN_OLED" =~ ^(yes|y|Y)$ ]]; then
   echo "Configuring and installing OLED driver"
+  cd /home/loragw/
   replaceAppend /boot/config.txt "^dtparam=i2c_arm=.*$" "dtparam=i2c_arm=on,i2c_baudrate=400000"
   apt-get install -y --force-yes i2c-tools python-dev python-pip libfreetype6-dev libjpeg-dev build-essential
 
@@ -220,6 +221,12 @@ if [[ "$EN_OLED" =~ ^(yes|y|Y)$ ]]; then
   mkdir -p /usr/share/fonts/truetype/luma
   git clone https://github.com/rm-hull/luma.examples.git
   cp luma.examples/examples/fonts/*.ttf /usr/share/fonts/truetype/luma/
+
+  #echo "Build examples files"
+  #sudo apt install libsdl-dev libportmidi-dev libsdl-ttf2.0-dev libsdl-mixer1.2-dev libsdl-image1.2-dev
+  #sudo pip install --upgrade setuptools
+  #cd luma.examples
+  #udo -H pip install -e .
 fi
 
 if [[ "$BUILD_GW" =~ ^(yes|y|Y)$ ]]; then
