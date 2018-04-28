@@ -13,11 +13,11 @@ echo "Raspian for being a LoRaWAN Gateway"
 echo
 echo "Device is $MODEL"
 echo
-echo "Run time ~10 minutes. Reboot required."
+echo "Run time ~5 minutes. Reboot required."
 echo
-echo -n "CONTINUE? [y/N] "
+echo -n "CONTINUE? [Y/n] "
 read
-if [[ ! "$REPLY" =~ ^(yes|y|Y)$ ]]; then
+if [[ "$REPLY" =~ ^(no|n|N)$ ]]; then
 	echo "Canceled."
 	exit 0
 fi
@@ -47,7 +47,7 @@ append1() {
 
 echo "Updating dependencies"
 apt-get update && sudo apt-get upgrade && sudo apt-get update
-apt-get install git-core build-essential ntp scons python-dev swig python-psutil
+apt-get install -y --force-yes git-core build-essential ntp scons python-dev swig python-psutil
 
 echo "Adding new user loragw, enter it password"
 useradd -m loragw -s /bin/bash
@@ -91,8 +91,9 @@ HOST=loragw-${Array[4]}${Array[5]}
 echo "New hostname will be set to $HOST"
 echo -n "OK? [y/N] "
 read
-if [[ ! "$REPLY" =~ ^(yes|y|Y)$ ]]; then
-	hostname $HOST
+if [[ "$REPLY" =~ ^(yes|y|Y)$ ]]; then
+	echo "hostname is now $HOST"
+	sudo bash -c "echo $HOST" > /etc/hostname
 fi
 
 echo "Done."
