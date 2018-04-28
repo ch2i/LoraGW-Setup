@@ -158,22 +158,23 @@ fi
 # Set the reset în in startup shell
 replace ./start.sh "^.*RESET_BCM_PIN=.*$" "RESET_BCM_PIN=$GW_RESET_PIN"
 
-apt-get -y install protobuf-compiler libprotobuf-dev libprotoc-dev automake libtool autoconf python-dev python-rpi.gpio
-
-grep "Pi 3" $MODEL >/dev/null
+grep "Pi\ 3" $MODEL >/dev/null
 if [ $? -eq 0 ]; then
 	echo "Installing nodejs v8 for Raspberry PI 3"
 	curl -sL https://deb.nodesource.com/setup_8.x | sudo -E bash -
 	apt-get install nodejs
 fi
 
-grep "Pi Zero" $MODEL >/dev/null
+grep "Pi\ Zero" $MODEL >/dev/null
 if [ $? -eq 0 ]; then
 	echo "Installing nodejs lts for Raspberry PI Zero"
 	wget -O - https://raw.githubusercontent.com/sdesalas/node-pi-zero/master/install-node-v.lts.sh | bash
 	append1 /home/loragw/.profile "^.*PATH:/opt/nodejs/bin.*$" "export PATH=$PATH:/opt/nodejs/bin"
 	append1 /home/loragw/.profile "^.*NODE_PATH=.*$" "NODE_PATH=/opt/nodejs/lib/node_modules"
 fi
+
+apt-get -y install protobuf-compiler libprotobuf-dev libprotoc-dev automake libtool autoconf python-dev python-rpi.gpio
+
 
 # Board has WS1812B LED
 if [[ $BOARD_TARGET == 2 ]]; then
