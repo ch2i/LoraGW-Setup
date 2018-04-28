@@ -163,6 +163,13 @@ if [ $? -eq 0 ]; then
 	echo "Installing nodejs v8 for Raspberry PI 3"
 	curl -sL https://deb.nodesource.com/setup_8.x | sudo -E bash -
 	apt-get install nodejs
+
+  # iC880a and RPI 3 Setup Activity LED and Power OFF Led 
+  if [[ $BOARD_TARGET == 3 ]]; then
+    replaceAppend /boot/config.txt "^dtoverlay=gpio-poweroff.*$" "dtoverlay=gpio-poweroff,gpiopin=24"
+    replaceAppend /boot/config.txt "^dtoverlay=pi3-act-led.*$" "dtoverlay=pi3-act-led,gpio=23"
+  fi
+
 fi
 
 grep "Pi\ Zero" /proc/device-tree/model >/dev/null
@@ -313,20 +320,21 @@ if [[ "$BUILD_GW" =~ ^(yes|y|Y)$ ]]; then
 fi
 
 # Copying all needed script and system
-sudo cp ./oled.py $GW_DIR/
-sudo cp ./monitor-ws2812.py $GW_DIR/
-sudo cp ./monitor-gpio.py $GW_DIR/
-sudo ln -s $GW_DIR/$MONITOR_SCRIPT $GW_DIR/monitor.py
+cd ~/LoraGW-Setup
+sudo cp ./oled.py $INSTALL_DIR/
+sudo cp ./monitor-ws2812.py  $INSTALL_DIR/
+sudo cp ./monitor-gpio.py  $INSTALL_DIR/
+sudo ln -s $INSTALL_DIR/$MONITOR_SCRIPT  $INSTALL_DIR/monitor.py
 sudo cp ./monitor.service /lib/systemd/system/
 sudo cp ./oled.service /lib/systemd/system/
-sudo cp start.sh $GW_DIR/
+sudo cp start.sh  $INSTALL_DIR/
 
 if [[ "$EN_TTN" =~ ^(yes|y|Y)$ ]]; then
   # script to get config from TTN server
   python set_config.py
 
   # Copy config to running folder
-  sudo mv global_conf.json $GW_DIR/
+  sudo mv global_conf.json  $INSTALL_DIR/
 
   # Prepare start forwarder as systemd script
   sudo cp ./loragw.service /lib/systemd/system/
