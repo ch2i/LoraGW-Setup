@@ -89,15 +89,18 @@ if [[ $BOARD_TARGET == 1 ]]; then
   GW_RESET_PIN=25
   MONITOR_SCRIPT=monitor-ws2812.py
   export GW_RESET_PIN
-elif [[ $BOARD_TARGET == 2 ]]; then
+fi
+if [[ $BOARD_TARGET == 2 ]]; then
   GW_RESET_PIN=25
   MONITOR_SCRIPT=monitor-ws2812.py
   export GW_RESET_PIN
-elif [[ $BOARD_TARGET == 3 ]]; then
+fi
+if [[ $BOARD_TARGET == 3 ]]; then
   GW_RESET_PIN=17
   MONITOR_SCRIPT=monitor-gpio.py
   export GW_RESET_PIN
 fi
+echo "Monitor script is $MONITOR_SCRIPT, reset pin is $GW_RESET_PIN"
 
 echo ""
 echo -n "Do you want to build Kersing packet forwarder [Y/n] "
@@ -156,7 +159,7 @@ if [[ "$EN_TTN" =~ ^(yes|y|Y)$ ]]; then
 fi
 
 # Set the reset în in startup shell
-replace ./start.sh "^.*RESET_BCM_PIN=.*$" "RESET_BCM_PIN=$GW_RESET_PIN"
+replace ./start.sh "^.*RESET_BCM_PIN=.*$" "SX1301_RESET_BCM_PIN=$GW_RESET_PIN"
 
 grep "Pi\ 3" /proc/device-tree/model >/dev/null
 if [ $? -eq 0 ]; then
