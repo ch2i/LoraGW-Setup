@@ -320,14 +320,14 @@ if [[ "$BUILD_GW" =~ ^(yes|y|Y)$ ]]; then
 fi
 
 # Copying all needed script and system
-cd ~/LoraGW-Setup
-sudo cp ./oled.py $INSTALL_DIR/
-sudo cp ./monitor-ws2812.py  $INSTALL_DIR/
-sudo cp ./monitor-gpio.py  $INSTALL_DIR/
-sudo ln -s $INSTALL_DIR/$MONITOR_SCRIPT  $INSTALL_DIR/monitor.py
-sudo cp ./monitor.service /lib/systemd/system/
-sudo cp ./oled.service /lib/systemd/system/
-sudo cp start.sh  $INSTALL_DIR/
+cd /home/loragw/LoraGW-Setup
+cp ./oled.py $INSTALL_DIR/
+cp ./monitor-ws2812.py  $INSTALL_DIR/
+cp ./monitor-gpio.py  $INSTALL_DIR/
+ln -s $INSTALL_DIR/$MONITOR_SCRIPT  $INSTALL_DIR/monitor.py
+cp ./monitor.service /lib/systemd/system/
+cp ./oled.service /lib/systemd/system/
+cp start.sh  $INSTALL_DIR/
 
 if [[ "$EN_TTN" =~ ^(yes|y|Y)$ ]]; then
   # script to get config from TTN server
