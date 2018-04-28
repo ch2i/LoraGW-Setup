@@ -214,7 +214,7 @@ fi
 if [[ "$EN_OLED" =~ ^(yes|y|Y)$ ]]; then
   echo "Configuring and installing OLED driver"
   cd /home/loragw/
-  replaceAppend /boot/config.txt "^dtparam=i2c_arm=.*$" "dtparam=i2c_arm=on,i2c_baudrate=400000"
+  replaceAppend /boot/config.txt "^.*dtparam=i2c_arm=.*$" "dtparam=i2c_arm=on,i2c_baudrate=400000"
   apt-get install -y --force-yes i2c-tools python-dev python-pip libfreetype6-dev libjpeg-dev build-essential
 
   echo "Install luma OLED core"
