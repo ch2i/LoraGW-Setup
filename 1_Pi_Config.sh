@@ -61,10 +61,10 @@ chown loragw:loragw /home/loragw/.*
 usermod -a -G i2c,spi,gpio loragw
 
 echo "Enabling Uart, I2C, SPI, Video Memory to 16MB"
-replaceAppend /boot/config.txt "^enable_uart.*$" "enable_uart=1"
-replaceAppend /boot/config.txt "^dtparam=i2c_arm=.*$" "dtparam=i2c_arm=on"
-replaceAppend /boot/config.txt "^dtparam=spi=.*$" "dtparam=spi=on"
-replaceAppend /boot/config.txt "^gpu_mem=.*$" "gpu_mem=16"
+replaceAppend /boot/config.txt "^.*enable_uart.*$" "enable_uart=1"
+replaceAppend /boot/config.txt "^.*dtparam=i2c_arm=.*$" "dtparam=i2c_arm=on"
+replaceAppend /boot/config.txt "^.*dtparam=spi=.*$" "dtparam=spi=on"
+replaceAppend /boot/config.txt "^.*gpu_mem=.*$" "gpu_mem=16"
 
 echo -n "Do you want to configure timezone [y/N] "
 read
