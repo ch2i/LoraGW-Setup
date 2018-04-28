@@ -13,11 +13,11 @@ echo "Raspian for being a LoRaWAN Gateway"
 echo
 echo "Device is $MODEL"
 echo
-echo "Run time ~10 minutes. Reboot required."
+echo "Run time ~5 minutes. Reboot required."
 echo
-echo -n "CONTINUE? [y/N] "
+echo -n "CONTINUE? [Y/n] "
 read
-if [[ ! "$REPLY" =~ ^(yes|y|Y)$ ]]; then
+if [[ "$REPLY" =~ ^(no|n|N)$ ]]; then
 	echo "Canceled."
 	exit 0
 fi
@@ -91,8 +91,9 @@ HOST=loragw-${Array[4]}${Array[5]}
 echo "New hostname will be set to $HOST"
 echo -n "OK? [y/N] "
 read
-if [[ ! "$REPLY" =~ ^(yes|y|Y)$ ]]; then
-	sudo echo "$HOST" >/etc/hostname
+if [[ "$REPLY" =~ ^(yes|y|Y)$ ]]; then
+	echo "hostname is now $HOST"
+	sudo bash -c "echo $HOST" > /etc/hostname
 fi
 
 echo "Done."
