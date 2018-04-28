@@ -80,216 +80,37 @@ So please **for security reasons, you should change this default password**
 passwd 
 ``` 
 
+### Launch PI configuration script
 ```shell
-sudo apt-get update && sudo apt-get upgrade
-sudo apt-get install git-core build-essential ntp scons python-dev swig python-psutil
+wget https://raw.githubusercontent.com/ch2i/LoraGW-Setup/master/1_Pi_Config.sh
+sudo ./1_Pi_Config.sh
 ``` 
 
-If the 2nd command fire the following error (always happen with latest rasbian because it updates kernel and co) 
-then just **reboot** and restart the 2 commands above.
-
-```
-Reading package lists... Done
-Building dependency tree
-Reading state information... Done
-Package python-psutil is not available, but is referred to by another package.
-This may mean that the package is missing, has been obsoleted, or
-is only available from another source
-
-Package ntp is not available, but is referred to by another package.
-This may mean that the package is missing, has been obsoleted, or
-is only available from another source
-
-Package python-dev is not available, but is referred to by another package.
-This may mean that the package is missing, has been obsoleted, or
-is only available from another source
-However the following packages replace it:
-  python
-
-E: Unable to locate package git-core
-E: Package 'ntp' has no installation candidate
-E: Unable to locate package scons
-E: Package 'python-dev' has no installation candidate
-E: Unable to locate package swig
-E: Package 'python-psutil' has no installation candidate
-```
-
-## Create a new user account (loragw).
-
-This `loragw` account will be used instead of default existing `pi` account for security reasons.
-```shell
-sudo useradd -m loragw -s /bin/bash
-``` 
-
-Type a suitable password for the `loragw` account.
-```shell
-sudo passwd loragw
-``` 
-
-Add the `loragw` user to the group `sudo` and allow sudo command with no password
-```shell
-sudo usermod -a -G sudo loragw
-sudo cp /etc/sudoers.d/010_pi-nopasswd /etc/sudoers.d/010_loragw-nopasswd
-sudo sed -i -- 's/pi/loragw/g' /etc/sudoers.d/010_loragw-nopasswd
-``` 
-
-copy default `pi` profile to `loragw`
-```shell
-sudo cp /home/pi/.profile /home/loragw/
-sudo cp /home/pi/.bashrc /home/loragw/
-sudo chown loragw:loragw /home/loragw/.*
-``` 
-
-Give `loragw` access to hardware I2C, SPI and GPIO
-```shell
-sudo usermod -a -G i2c,spi,gpio loragw
-``` 
-
-Now do some system configuration with `raspi-config` tool (bold are mandatory)
-```shell
-sudo raspi-config
-``` 
-
-  - network options, change hostname (loragw for example)
-  - localization options, change keyboard layout
-  - localization options, change time zone
-  - **interfacing options, enable SPI, I2C** Serial and SSH (if not already done)
-  - advanced options, expand filesystem
-  - advanced options, reduce video memory split set to 16M
-
-then do not when asked.
-
-## Optionnal, Install log2ram this will preserve your SD card
-```shell
-git clone https://github.com/azlux/log2ram.git
-cd log2ram
-chmod +x install.sh uninstall.sh
-sudo ./install.sh
-sudo ln -s /usr/local/bin/ram2disk /etc/cron.hourly/
-```
-
-
-## Now reboot
-
-**Reboot**
-```shell
-sudo reboot
-```
 
 ## Reconnect after reboot
 
-Log back with `loragw` user and if you changed hostname to loragw, use this command
+Log back with `loragw` user and if you changed hostname to loragw-xxyy, use this command
 ```shell
-ssh loragw@loragw.local
+ssh loragw@loragw-xxyy.local
 ``` 
 
 
-## Install nodejs
-
-### For Pi Zero (see below for PI3)
-``` 
-sudo wget -O - https://raw.githubusercontent.com/sdesalas/node-pi-zero/master/install-node-v.lts.sh | bash
-``` 
-
-this will fire some error on unlink, but don't worry, that's ok because it's the first install.
-
-Add the following to the end of your `~/.profile` file with `nano ~/.profile`
-``` 
-export PATH=$PATH:/opt/nodejs/bin
-export NODE_PATH=/opt/nodejs/lib/node_modules
-``` 
-
-then **logout (CTRL-d) and log back** with `loragw` user* so new profile is loaded.
-```shell
-logout
-``` 
-
-### For Pi 3 (see above for PI Zero)
-You can select and change nodejs version by changing for example `setup_8.x` to `setup_7.x`
-``` 
-sudo curl -sL https://deb.nodesource.com/setup_8.x | sudo -E bash -
-sudo apt-get install nodejs
-``` 
-
-
-## Install WS2812 driver for onboard LED (for RAK831 shield only)
-
-The onboard WS2812 library and the Raspberry Pi audio both use the PWM, they cannot be used together. You will need to blacklist the Broadcom audio kernel module by editing a file 
-``` 
-echo "blacklist snd_bcm2835" | sudo tee --append /etc/modprobe.d/snd-blacklist.conf
-``` 
-
-### Install WS2812 led driver (for RAK831 shield only)
-``` 
-git clone https://github.com/jgarff/rpi_ws281x
-cd rpi_ws281x/
-scons
-scons deb
-sudo dpkg -i libws2811*.deb
-sudo cp ws2811.h /usr/local/include/
-sudo cp rpihw.h /usr/local/include/
-sudo cp pwm.h /usr/local/include/
-``` 
-
-### Install WS2812 python wrapper (for RAK831 shield only)
-``` 
-cd python
-python ./setup.py build
-``` 
-
-### Install WS2812 python library (for RAK831 shield only)
-``` 
-sudo python setup.py install
-``` 
-
-### Install NodeJS version of WS2812 driver (for RAK831 shield only)
-``` 
-cd
-sudo npm install -g --unsafe-perm rpi-ws281x-native
-npm link rpi-ws281x-native
-``` 
-
-## Install Python I2C/SPI OLED library (if you want to use OLED dispay)
-
-Optionnaly you can add OLED to display usefull informations on it. Please look at this [documentation](https://github.com/ch2i/LoraGW-Setup/blob/master/doc/DisplayOled.md) for more informations
-
-## Get CH2i Gateway Install repository
+### Get CH2i Gateway Install repository
 ``` 
 git clone https://github.com/ch2i/LoraGW-Setup
-```
-
-### Test WS2812 LED if you have any, in python or nodejs
-Check that led color match the color displayed on console because on some WS2812B led, Red and Green could be reversed.
-``` 
 cd LoraGW-Setup
-sudo ./testled.py
-sudo ./testled.js
-``` 
-
-## Build and setup Packet Forwarder
-
-New Multi-protocol Packet Forwarder by Jac @Kersing (thanks to @jpmeijers for scripting stuff)
-Now build the whole thing, time to get a(nother) coffe, it can take 10/15 minutes!
-``` 
-sudo ./build.sh
-``` 
-
-## Build and setup legacy Packet Forwarder (optionnal)
-
-If you really want to use the legacy packet forwarder you can launch this script. Both can be compiled on the same target, no problem, see below how to setup the legacy
-``` 
-sudo ./build_legacy.sh
-``` 
+```
 
 ## Configure Gateway on TTN console
 
 Now you need to register your new GW on ttn before next step, see [gateway registration](https://www.thethingsnetwork.org/docs/gateways/registration.html#via-gateway-connector), fill the GW_ID and GW_KEY when running
 
-## Launch TTN gateway configuration
-This script will configure forwarder and all needed configuration 
+### Then launch script to install all stuff
+
+```shell
+sudo ./2_Setup.sh
 ``` 
-sudo ./setup.sh
-``` 
+
 
 That's it, If you are using PI Zero [shield](https://github.com/hallard/RAK831-Zero), the 2 LED should be blinking green and you should be able to see your brand new gateway on TTN
 
@@ -336,22 +157,22 @@ You can change LED code behaviour at the end of script `/opt/loragw/monitor.py`
 ## Shutdown
 You can press (and let it pressed) the switch push button, leds well become RED and after 2s start blinking in blue. If you release button when they blink blue, the Pi will initiate a shutdown. So let it 30s before removing power.
 
-### Shutdown LED display (for iC880a only)
+### Shutdown LED display (for RPI 3 and iC880a only)
 
-If you have a raspberry PI with this [IC880A shield](https://github.com/ch2i/iC880A-Raspberry-PI), and if you modded the `/boot/config.txt` file with following lines added into:
+If you have a raspberry PI 3 with this [iC880A shield](https://github.com/ch2i/iC880A-Raspberry-PI), then the `/boot/config.txt` file has been enhanced with the following lines:
 
 ```
 # When system if Halted/OFF Light Green LED
 dtoverlay=gpio-poweroff,gpiopin=24
 ```
-then the Green LED (gpio24) will stay on when you can remove the power of the gateway. It's really a great indicator.
+The Green LED (gpio24) will stay on when you can remove the power of the gateway. It's really a great indicator.
 
 You can also select which GPIO LED is used to replace activity LED if you need it.
 ```
 # Activity LED
 dtoverlay=pi3-act-led,gpio=23
 ```
-then the Red LED (gpio23) will blink on activity.
+The Red LED (gpio23) will blink on activity.
 
 ## Detailled information
 
@@ -437,7 +258,12 @@ Jan 22 01:01:11 loragw loragw[240]: 01:01:11  INFO: [TTN] send status success fo
 ```
 
 
-### Use legacy Packet Forwarder
+### Use legacy Packet Forwarder (not needed)
+
+First build it
+```
+./build_legacy.sh
+``` 
 
 If you want to use the legacy packet forwarder, you'll need to change file `/opt/loragw/start.sh` to replace the last line
 
