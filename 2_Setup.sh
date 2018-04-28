@@ -186,6 +186,7 @@ apt-get -y install protobuf-compiler libprotobuf-dev libprotoc-dev automake libt
 # Board has WS1812B LED
 if [[ $BOARD_TARGET == 2 ]]; then
   echo "Installing WS2812B LED driver"
+  cd /home/loragw/
 
   echo "Blacklisting snd_bcm2835 module due to WS2812b LED PWM"
   append1 /etc/modprobe.d/snd-blacklist.conf "^.*snd_bcm2835.*$" "blacklist snd_bcm2835"
