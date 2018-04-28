@@ -29,6 +29,17 @@ if [[ "$REPLY" =~ ^(yes|y|Y)$ ]]; then
 fi
 
 # Given a filename, a regex pattern to match and a replacement string:
+# Replace string if found, else no change.
+# (# $1 = filename, $2 = pattern to match, $3 = replacement)
+replace() {
+  grep $2 $1 >/dev/null
+  if [ $? -eq 0 ]; then
+    # Pattern found; replace in file
+    sed -i "s/$2/$3/g" $1 >/dev/null
+  fi
+}
+
+# Given a filename, a regex pattern to match and a replacement string:
 # If found, perform replacement, else append file w/replacement on new line.
 replaceAppend() {
 	grep $2 $1 >/dev/null
