@@ -8,15 +8,8 @@ fi
 
 MODEL=`cat /proc/device-tree/model`
 
-echo "This script configures a Raspberry Pi"
-echo "as a LoRaWAN Gateway connected to TTN,"
-echo
-echo "It will install the following dependencies"
-echo "nodejs, git, pyhton, ntp, scons, ws2812 and" 
-echo "create a new user called loragw"
-echo "THERE IS NO SCRIPT TO REVERSE THIS SETUP!"
-echo "config should be complete before using"
-echo "this script. MAKE A BACKUP FIRST."
+echo "This script configure a Raspberry Pi"
+echo "Raspian for being a LoRaWAN Gateway"
 echo
 echo "Device is $MODEL"
 echo
