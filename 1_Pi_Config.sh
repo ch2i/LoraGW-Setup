@@ -138,12 +138,11 @@ if [[ $SEL -gt 1 ]]; then
     NEWHOST=loragw
 	fi
 	sudo bash -c "echo $NEWHOST" > /etc/hostname
-	replace /etc/hosts  "^127.0.1.1.*$HOSTNAME.*$" "127.0.1.1    $NEWHOST"
+	replace /etc/hosts  "^127.0.1.1.*$HOSTNAME.*$" "127.0.1.1\t$NEWHOST"
   echo "New hostname set to $NEWHOST"
 else
   echo "hostname unchanged"
 fi
-
 
 echo "Done."
 echo
