@@ -22,6 +22,22 @@ if [[ "$REPLY" =~ ^(no|n|N)$ ]]; then
 	exit 0
 fi
 
+# These functions have been copied from excellent Adafruit Read only tutorial
+# https://github.com/adafruit/Raspberry-Pi-Installer-Scripts/blob/master/read-only-fs.sh
+# the one inspired by my original article http://hallard.me/raspberry-pi-read-only/
+# That's an excellent demonstration of collaboration and open source sharing
+# 
+# Given a filename, a regex pattern to match and a replacement string:
+# Replace string if found, else no change.
+# (# $1 = filename, $2 = pattern to match, $3 = replacement)
+replace() {
+	grep $2 $1 >/dev/null
+	if [ $? -eq 0 ]; then
+		# Pattern found; replace in file
+		sed -i "s/$2/$3/g" $1 >/dev/null
+	fi
+}
+
 # Given a filename, a regex pattern to match and a replacement string:
 # If found, perform replacement, else append file w/replacement on new line.
 replaceAppend() {
@@ -45,20 +61,41 @@ append1() {
 	fi
 }
 
+# Given a list of strings representing options, display each option
+# preceded by a number (1 to N), display a prompt, check input until
+# a valid number within the selection range is entered.
+selectN() {
+	for ((i=1; i<=$#; i++)); do
+		echo $i. ${!i}
+	done
+	echo
+	REPLY=""
+	while :
+	do
+		echo -n "SELECT 1-$#: "
+		read
+		if [[ $REPLY -ge 1 ]] && [[ $REPLY -le $# ]]; then
+			return $REPLY
+		fi
+	done
+}
+
 echo "Updating dependencies"
 apt-get update && sudo apt-get upgrade && sudo apt-get update
 apt-get install -y --force-yes git-core build-essential ntp scons python-dev swig python-psutil
 
-echo "Adding new user loragw, enter it password"
-useradd -m loragw -s /bin/bash
-passwd loragw
-usermod -a -G sudo loragw
-cp /etc/sudoers.d/010_pi-nopasswd /etc/sudoers.d/010_loragw-nopasswd
-sed -i -- 's/pi/loragw/g' /etc/sudoers.d/010_loragw-nopasswd
-cp /home/pi/.profile /home/loragw/
-cp /home/pi/.bashrc /home/loragw/
-chown loragw:loragw /home/loragw/.*
-usermod -a -G i2c,spi,gpio loragw
+if [[! -d /home/loragw ]]; then
+  echo "Adding new user loragw, enter it password"
+	useradd -m loragw -s /bin/bash
+	passwd loragw
+	usermod -a -G sudo loragw
+	cp /etc/sudoers.d/010_pi-nopasswd /etc/sudoers.d/010_loragw-nopasswd
+	sed -i -- 's/pi/loragw/g' /etc/sudoers.d/010_loragw-nopasswd
+	cp /home/pi/.profile /home/loragw/
+	cp /home/pi/.bashrc /home/loragw/
+	chown loragw:loragw /home/loragw/.*
+	usermod -a -G i2c,spi,gpio loragw
+fi
 
 echo "Enabling Uart, I2C, SPI, Video Memory to 16MB"
 replaceAppend /boot/config.txt "^.*enable_uart.*$" "enable_uart=1"
@@ -73,34 +110,46 @@ if [[ "$REPLY" =~ ^(yes|y|Y)$ ]]; then
 	dpkg-reconfigure tzdata
 fi
 
-echo -n "Do you want to enable log2ram [y/N] "
-read
-if [[ "$REPLY" =~ ^(yes|y|Y)$ ]]; then
-	echo "Setting up log2ram."
-	git clone https://github.com/azlux/log2ram.git
-	cd log2ram
-	chmod +x install.sh uninstall.sh
-	./install.sh
-	ln -s /usr/local/bin/ram2disk /etc/cron.hourly/
+if [[! -f /usr/local/bin/ram2disk ]]; then
+	echo -n "Do you want to enable log2ram [y/N] "
+	read
+	if [[ "$REPLY" =~ ^(yes|y|Y)$ ]]; then
+		echo "Setting up log2ram."
+		git clone https://github.com/azlux/log2ram.git
+		cd log2ram
+		chmod +x install.sh uninstall.sh
+		./install.sh
+		ln -s /usr/local/bin/ram2disk /etc/cron.hourly/
+		echo ""
+	fi
 fi
 
 # set hostname to loragw-xxyy with xxyy last MAC Address digits
 set -- `cat /sys/class/net/wlan0/address`
 IFS=":"; declare -a Array=($*)
-HOST=loragw-${Array[4]}${Array[5]}
-echo "New hostname will be set to $HOST"
-echo -n "OK? [y/N] "
-read
-if [[ "$REPLY" =~ ^(yes|y|Y)$ ]]; then
-	echo "hostname is now $HOST"
-	sudo bash -c "echo $HOST" > /etc/hostname
+NEWHOST=loragw-${Array[4]}${Array[5]}
+
+echo ""
+echo "Please select new device name (hostname)"
+selectN "Leave as $HOSTNAME" "loragw" "$NEWHOST"
+SEL=$?
+if [[ $SEL -gt 1 ]]; then
+	if [[ $SEL == 2 ]]; then
+    NEWHOST=loragw
+	fi
+	sudo bash -c "echo $NEWHOST" > /etc/hostname
+	replace /etc/hosts  "^127.0.1.1.*$HOSTNAME.*$" "127.0.1.1    $NEWHOST"
+  echo "New hostname set to $NEWHOST"
+else
+  echo "hostname unchanged"
 fi
+
 
 echo "Done."
 echo
 echo "Settings take effect on next boot."
 echo "after reboot, login back here with"
-echo "ssh loragw@$HOST.local"
+echo "ssh loragw@$NEWHOST.local"
 echo
 echo -n "REBOOT NOW? [y/N] "
 read
