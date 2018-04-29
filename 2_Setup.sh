@@ -117,6 +117,10 @@ echo -n "Do you want to build Kersing packet forwarder [Y/n] "
 read BUILD_GW
 
 echo ""
+echo -n "Do you want to build legacy packet forwarder [y/N] "
+read BUILD_LEGACY
+
+echo ""
 echo "You can enable monitor service that manage blinking led to"
 echo "display status and also add button management to shutdown PI"
 echo -n "Would you like to enable this [Y/n] "
@@ -336,13 +340,67 @@ if [[ ! "$BUILD_GW" =~ ^(no|n|N)$ ]]; then
   cp $INSTALL_DIR/dev/packet_forwarder/mp_pkt_fwd/mp_pkt_fwd $INSTALL_DIR/mp_pkt_fwd
 
   if [ ! -f $INSTALL_DIR/mp_pkt_fwd ]; then
-      echo "Oup's, something went wrong, forwarder not found"
+      echo "Oup's, something went wrong, kersing forwarder not found"
       echo "please check for any build error"
   else
       echo "Build & Installation Completed."
-      echo "forwrder is located at $INSTALL_DIR/mp_pkt_fwd"
+      echo "kersing forwarder is located at $INSTALL_DIR/mp_pkt_fwd"
       echo ""
   fi
+fi
+
+
+if [[ "$BUILD_LEGACY" =~ ^(yes|y|Y)$ ]]; then
+  echo "Building legacy packet Forwarder"
+
+  mkdir -p $INSTALL_DIR/dev
+  mkdir -p $INSTALL_DIR/dev/legacy
+  cd $INSTALL_DIR/dev/legacy
+
+  # Build legacy loragw library
+  if [ ! -d lora_gateway ]; then
+      git clone https://github.com/TheThingsNetwork/lora_gateway.git 
+      pushd lora_gateway
+  else
+      pushd lora_gateway
+      git reset --hard
+      git pull
+  fi
+  sed -i -e 's/PLATFORM= .*$/PLATFORM= imst_rpi/g' ./libloragw/library.cfg
+  sed -i -e 's/CFG_SPI= .*$/CFG_SPI= native/g' ./libloragw/library.cfg
+  make
+
+  popd
+  # Build legacy packet forwarder
+  if [ ! -d packet_forwarder ]; then
+      git clone https://github.com/ch2i/packet_forwarder
+      pushd packet_forwarder
+  else
+      pushd packet_forwarder
+      git pull
+      git reset --hard
+  fi
+  make
+  popd
+
+  if [ ! -f $INSTALL_DIR/poly_pkt_fwd ]; then
+    echo "Oup's, something went wrong, legacy forwarder not found"
+    echo "please check for any build error"
+  else
+    # Copy things needed at runtime to where they'll be expected
+    cp $INSTALL_DIR/dev/legacy/packet_forwarder/poly_pkt_fwd/poly_pkt_fwd $INSTALL_DIR/poly_pkt_fwd
+    echo "Build & Installation Completed."
+    echo "forwarder is located at $INSTALL_DIR/poly_pkt_fwd"
+    echo ""
+    echo "Do you want this forwarder to be run instead"
+    echo -n "kersing mp_pkt_fwd? [y/N] "
+    read
+    if [[ "$REPLY" =~ ^(yes|y|Y)$ ]]; then
+      replace ./start.sh "^.*mp_pkt_fwd.*$" "./poly_pkt_fwd"
+    fi
+
+  fi
+
 fi
 
 # Copying all needed script and system
