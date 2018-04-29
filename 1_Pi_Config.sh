@@ -106,6 +106,7 @@ replaceAppend /boot/config.txt "^.*enable_uart.*$" "enable_uart=1"
 replaceAppend /boot/config.txt "^.*dtparam=i2c_arm=.*$" "dtparam=i2c_arm=on"
 replaceAppend /boot/config.txt "^.*dtparam=spi=.*$" "dtparam=spi=on"
 replaceAppend /boot/config.txt "^.*gpu_mem=.*$" "gpu_mem=16"
+replaceAppend /etc/modules "^.*i2c-dev.*$" "i2c-dev"
 
 echo -n "Do you want to configure timezone [y/N] "
 read
