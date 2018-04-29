@@ -90,6 +90,40 @@ def lan_ip(iface):
 
   return "%-5s: Unknown IP" % iface
 
+def uptime():
+  try:
+    f = open( "/proc/uptime" )
+    contents = f.read().split()
+    f.close()
+  except:
+    return "no /proc/uptime"
+
+  total_seconds = float(contents[0])
+
+  # Helper vars:
+  MINUTE  = 60
+  HOUR    = MINUTE * 60
+  DAY     = HOUR * 24
+
+  # Get the days, hours, etc:
+  days    = int( total_seconds / DAY )
+  hours   = int( ( total_seconds % DAY ) / HOUR )
+  minutes = int( ( total_seconds % HOUR ) / MINUTE )
+  seconds = int( total_seconds % MINUTE )
+
+  # Build up the pretty string (like this: "N days, N hours, N minutes, N seconds")
+  string = ""
+  if days > 0:
+    string += str(days) + " " + (days == 1 and "day" or "days" ) + ", "
+  if len(string) > 0 or hours > 0:
+    string += str(hours) + " " + (hours == 1 and "hour" or "hours" ) + ", "
+  if len(string) > 0 or minutes > 0:
+    string += str(minutes) + " " + (minutes == 1 and "min" or "mins" ) + ", "
+  if hours == 0:
+    string += str(seconds) + " " + (seconds == 1 and "sec" or "secs" )
+
+  return string;
+
 def stats():
   global looper
   with canvas(device) as draw:
@@ -127,12 +161,13 @@ def stats():
       draw.text((col1, line2), "MEM FREE: %s/%s" % (bytes2human(mem.available), bytes2human(mem.total)), font=font10, fill=255)
       draw.text((col1, line3), "DSK FREE: %s/%s" % (bytes2human(dsk.total-dsk.used), bytes2human(dsk.total)),font=font10, fill=255)
       draw.text((col1, line4), "CPU TEMP: %sc" % (str(tempC/1000)), font=font10, fill=255)
-      looper=3
+      draw.text((col1, line4), "UP : %s" % uptime(), font=font10, fill=255)
+      looper=0
     else:
-      draw.text((col1, line1),"%s %s" % (platform.system(),platform.release()), font=font10, fill=255)
-      uptime = datetime.now() - datetime.fromtimestamp(psutil.boot_time())
-      draw.text((col1, line2),str(datetime.now().strftime('%a %b %d %H:%M:%S')), font=font10, fill=255)
-      draw.text((col1, line3),"Uptime %s" % str(uptime).split('.')[0], font=font10, fill=255)
+      #draw.text((col1, line1),"%s %s" % (platform.system(),platform.release()), font=font10, fill=255)
+      #uptime = datetime.now() - datetime.fromtimestamp(psutil.boot_time())
+      #draw.text((col1, line2),str(datetime.now().strftime('%a %b %d %H:%M:%S')), font=font10, fill=255)
+      #draw.text((col1, line3),"Uptime %s" % str(uptime).split('.')[0], font=font10, fill=255)
       looper=0
 
 def main():

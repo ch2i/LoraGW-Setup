@@ -21,7 +21,7 @@ ACTION=="add|change", SUBSYSTEM=="ieee80211", KERNEL=="phy0", RUN+="/sbin/iw phy
 
 ## Install the packages you need for DNS, Access Point and Firewall rules.
 ```
-sudo apt-get install hostapd dnsmasq iptables-persistent
+sudo apt-get install -y hostapd dnsmasq iptables-persistent
 ```
 
 ## Configure the DNS server
@@ -80,7 +80,7 @@ Replace `_AP_SSID_` with the SSID you want for your access point. Replace `_AP_P
 
 Change also `country_code` to your own country
 
-### Edit the file `/etc/hostapd/hostapd.conf` to enable service to start correctly
+### Edit the file `/etc/default/hostapd` to enable service to start correctly
 
 ```
 #DAEMON_OPTS=" -f /tmp/hostapd.log"
@@ -145,7 +145,7 @@ Make sure do disable dhcpcd with
 sudo update-rc.d dhcpcd disable
 ```
 
-Edit `/etc/rc.local` and add the following lines just before `exit 0`
+Edit `/etc/rc.local` and add the following lines just before `# Print the IP Address`
 
 ```shell
 ifdown --force wlan0 && ifdown --force ap0 && ifup ap0 && ifup wlan0
@@ -154,4 +154,24 @@ iptables -t nat -A POSTROUTING -s 192.168.50.0/24 ! -d 192.168.50.0/24 -j MASQUE
 systemctl restart dnsmasq
 ```
 
+## Optional, add AP display on OLED software
 
+If you have enabled OLED, you may need to change the following line in `/opt/loragw/oled.py` according to the connected network interface you have to add the ap0 interface
+
+Mine is wlan0 for WiFi and ap0 for WiFi [access point](https://github.com/ch2i/LoraGW-Setup/blob/master/doc/AccessPoint.md)
+```python
+draw.text((col1, line1),"Host :%s" % socket.gethostname(), font=font10, fill=255)
+draw.text((col1, line2), lan_ip("wlan0"),  font=font10, fill=255)
+draw.text((col1, line3), network("wlan0"),  font=font10, fill=255)
+draw.text((col1, line4), lan_ip("uap0"),  font=font10, fill=255)
+draw.text((col1, line5), network("uap0"),  font=font10, fill=255)
+```
+
+if for example it's running from RPI 3 with eth0 code could be 
+```python
+draw.text((col1, line1),"Host :%s" % socket.gethostname(), font=font10, fill=255)
+draw.text((col1, line2), lan_ip("eth0"),  font=font10, fill=255)
+draw.text((col1, line3), network("eth0"),  font=font10, fill=255)
+draw.text((col1, line4), lan_ip("ap0"),  font=font10, fill=255)
+draw.text((col1, line5), network("ap0"),  font=font10, fill=255)
+```
