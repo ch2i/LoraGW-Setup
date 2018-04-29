@@ -82,7 +82,11 @@ selectN() {
 
 echo "Updating dependencies"
 apt-get update && sudo apt-get upgrade && sudo apt-get update
-apt-get install -y --force-yes git-core build-essential ntp scons python-dev swig python-psutil
+apt-get install -y --force-yes git-core build-essential ntp scons i2c-tools
+
+echo "Updating python dependencies"
+apt-get install -y --force-yes python-dev swig python-psutil python-rpi.gpio python-pip
+python -m pip install --upgrade pip setuptools wheel
 
 if [[! -d /home/loragw ]]; then
   echo "Adding new user loragw, enter it password"
