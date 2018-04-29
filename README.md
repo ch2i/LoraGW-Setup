@@ -81,9 +81,13 @@ passwd
 ``` 
 
 ### Launch PI configuration script
+
+This [1_Pi_Config.sh](https://github.com/ch2i/LoraGW-Setup/blob/master/1_Pi_Config.sh) script will prepare your Pi environnment, create and configure a loragw user, add access to SPI, I2C, Uart. It will reduce video memory to 16MB to allow max memory for the stuff need to be done.
+It also enable excellent [log2ram](https://github.com/azlux/log2ram) SD card preservation.
+
 ```shell
 wget https://raw.githubusercontent.com/ch2i/LoraGW-Setup/master/1_Pi_Config.sh
-sudo ./1_Pi_Config.sh
+chmod ug+x 1_Pi_Config.sh && sudo ./1_Pi_Config.sh
 ``` 
 
 
@@ -97,13 +101,12 @@ ssh loragw@loragw-xxyy.local
 
 ### Get CH2i Gateway Install repository
 ``` 
-git clone https://github.com/ch2i/LoraGW-Setup
-cd LoraGW-Setup
+git clone https://github.com/ch2i/LoraGW-Setup && cd LoraGW-Setup
 ```
 
 ## Configure Gateway on TTN console
 
-Now you need to register your new GW on ttn before next step, see [gateway registration](https://www.thethingsnetwork.org/docs/gateways/registration.html#via-gateway-connector), fill the GW_ID and GW_KEY when running
+Now you need to register your new GW on TTN before next step, see [gateway registration](https://www.thethingsnetwork.org/docs/gateways/registration.html#via-gateway-connector), the GW_ID and GW_KEY will be asked by the script
 
 ### Then launch script to install all stuff
 
