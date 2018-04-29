@@ -19,11 +19,11 @@ echo "needed services (Monitor, Oled, GW) at boot"
 echo
 echo "Device is $MODEL"
 echo
-echo "Run time ~10 minutes."
+echo "Run time ~5 to 15 minutes depending on features."
 echo
 echo -n "CONTINUE? [Y/n] "
 read
-if [[ "$REPLY" =~ ^(yes|y|Y)$ ]]; then
+if [[ "$REPLY" =~ ^(no|n|N)$ ]]; then
   echo "Canceled."
   exit 0
 fi
@@ -62,6 +62,11 @@ append1() {
 	fi
 }
 
+# These functions have been copied from excellent Adafruit Read only tutorial
+# https://github.com/adafruit/Raspberry-Pi-Installer-Scripts/blob/master/read-only-fs.sh
+# the one inspired by my original article http://hallard.me/raspberry-pi-read-only/
+# That's an excellent demonstration of collaboration and open source sharing
+# 
 # Given a list of strings representing options, display each option
 # preceded by a number (1 to N), display a prompt, check input until
 # a valid number within the selection range is entered.
@@ -120,7 +125,7 @@ read EN_OLED
 echo ""
 echo -n "Do you want to setup TTN [Y/n] "
 read EN_TTN
-if [[ "$EN_TTN" =~ ^(yes|y|Y)$ ]]; then
+if [[ ! "$EN_TTN" =~ ^(no|n|N)$ ]]; then
 
   echo "It's now time to create and configure your gateway on TTN"
   echo "See https://www.thethingsnetwork.org/docs/gateways/registration.html#via-gateway-connector"
@@ -183,8 +188,7 @@ if [ $? -eq 0 ]; then
 	append1 /home/loragw/.profile "^.*NODE_PATH=.*$" "NODE_PATH=/opt/nodejs/lib/node_modules"
 fi
 
-apt-get -y install protobuf-compiler libprotobuf-dev libprotoc-dev automake libtool autoconf python-dev python-rpi.gpio
-
+apt-get -y install protobuf-compiler libprotobuf-dev libprotoc-dev automake libtool autoconf 
 
 # Board has WS1812B LED
 if [[ $BOARD_TARGET == 2 ]]; then
@@ -192,6 +196,7 @@ if [[ $BOARD_TARGET == 2 ]]; then
   cd /home/loragw/
 
   echo "Blacklisting snd_bcm2835 module due to WS2812b LED PWM"
+  touch /etc/modprobe.d/snd-blacklist.conf
   append1 /etc/modprobe.d/snd-blacklist.conf "^.*snd_bcm2835.*$" "blacklist snd_bcm2835"
 
   echo "Installing WS2812B drivers and libraries"
@@ -209,13 +214,16 @@ if [[ $BOARD_TARGET == 2 ]]; then
   cd /home/loragw/
   npm install -g --unsafe-perm rpi-ws281x-native
   npm link rpi-ws281x-native
+  # We're sudo reset owner
+  chown -R loragw:loragw /home/loragw/rpi_ws281x
+  chown -R loragw:loragw /home/loragw/node_modules
 fi
 
 if [[ "$EN_OLED" =~ ^(yes|y|Y)$ ]]; then
   echo "Configuring and installing OLED driver"
   cd /home/loragw/
   replaceAppend /boot/config.txt "^.*dtparam=i2c_arm=.*$" "dtparam=i2c_arm=on,i2c_baudrate=400000"
-  apt-get install -y --force-yes i2c-tools python-dev python-pip libfreetype6-dev libjpeg-dev build-essential
+  apt-get install -y --force-yes libfreetype6-dev libjpeg-dev
 
   echo "Install luma OLED core"
   sudo -H pip install --upgrade luma.oled
@@ -223,6 +231,8 @@ if [[ "$EN_OLED" =~ ^(yes|y|Y)$ ]]; then
   echo "Get examples files (and font)"
   mkdir -p /usr/share/fonts/truetype/luma
   git clone https://github.com/rm-hull/luma.examples.git
+  # We're sudo reset owner
+  chown -R loragw:loragw /home/loragw/luma.examples
   cp luma.examples/examples/fonts/*.ttf /usr/share/fonts/truetype/luma/
 
   #echo "Build examples files"
@@ -232,7 +242,7 @@ if [[ "$EN_OLED" =~ ^(yes|y|Y)$ ]]; then
   #udo -H pip install -e .
 fi
 
-if [[ "$BUILD_GW" =~ ^(yes|y|Y)$ ]]; then
+if [[ ! "$BUILD_GW" =~ ^(no|n|N)$ ]]; then
   echo "Building LoraGW and kersing packet Forwarder"
   mkdir -p $INSTALL_DIR/dev
   cd $INSTALL_DIR/dev
@@ -326,7 +336,6 @@ if [[ "$BUILD_GW" =~ ^(yes|y|Y)$ ]]; then
       echo "Build & Installation Completed."
       echo "forwrder is located at $INSTALL_DIR/mp_pkt_fwd"
       echo ""
-      echo "you can now run the setup script with sudo ./3_Configure.sh"
   fi
 fi
 
@@ -340,7 +349,7 @@ cp ./monitor.service /lib/systemd/system/
 cp ./oled.service /lib/systemd/system/
 cp start.sh  $INSTALL_DIR/
 
-if [[ "$EN_TTN" =~ ^(yes|y|Y)$ ]]; then
+if [[ ! "$EN_TTN" =~ ^(no|n|N)$ ]]; then
   # script to get config from TTN server
   python set_config.py
 
@@ -358,7 +367,7 @@ if [[ "$EN_TTN" =~ ^(yes|y|Y)$ ]]; then
 
 fi
 
-if [[ "$EN_MONITOR" =~ ^(yes|y|Y)$ ]]; then
+if [[ ! "$EN_MONITOR" =~ ^(no|n|N)$ ]]; then
   echo "monitor service enabled!"
   sudo systemctl enable monitor.service
   sudo systemctl start monitor.service
