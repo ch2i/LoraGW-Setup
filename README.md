@@ -127,6 +127,16 @@ sudo reboot
 
 ## LED Blinking colors (RAK831 Shied with 2 WS2812B Leds)
 
+WS2812B driver use DMA channel, and with new Raspbian version, using DMA 5 will corrupt your SD card. see this [issue](https://github.com/jgarff/rpi_ws281x/issues/224). It's now solved but if you have old GW with old scripts, be sure to update the line of script `/opt/loragw/monitor_ws2812.py` from 
+```python
+strip = Adafruit_NeoPixel(2, gpio_led, 800000, 5, False, 64, 0, ws.WS2811_STRIP_GRB)
+```
+
+to (using DMA channel 10 instead of 5)
+```python
+strip = Adafruit_NeoPixel(2, gpio_led, 800000, 10, False, 64, 0, ws.WS2811_STRIP_GRB)
+```
+
 ### LED 1
 
 - green => connected to Internet

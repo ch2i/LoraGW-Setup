@@ -142,7 +142,7 @@ def checkShutdown():
 signal.signal(signal.SIGINT, signal_handler)
 
 # Create NeoPixel object 2 LEDs, 64 Brighness GRB leds
-strip = Adafruit_NeoPixel(2, gpio_led, 800000, 5, False, 64, 0, ws.WS2811_STRIP_GRB)
+strip = Adafruit_NeoPixel(2, gpio_led, 800000, 10, False, 64, 0, ws.WS2811_STRIP_GRB)
 
 # Intialize the library (must be called once before other functions).
 strip.begin()
