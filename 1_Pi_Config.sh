@@ -88,7 +88,7 @@ echo "Updating python dependencies"
 apt-get install -y --force-yes python-dev swig python-psutil python-rpi.gpio python-pip
 python -m pip install --upgrade pip setuptools wheel
 
-if [[! -d /home/loragw ]]; then
+if [[ ! -d /home/loragw ]]; then
   echo "Adding new user loragw, enter it password"
 	useradd -m loragw -s /bin/bash
 	passwd loragw
@@ -114,7 +114,7 @@ if [[ "$REPLY" =~ ^(yes|y|Y)$ ]]; then
 	dpkg-reconfigure tzdata
 fi
 
-if [[! -f /usr/local/bin/ram2disk ]]; then
+if [[ ! -f /usr/local/bin/ram2disk ]]; then
 	echo -n "Do you want to enable log2ram [y/N] "
 	read
 	if [[ "$REPLY" =~ ^(yes|y|Y)$ ]]; then
