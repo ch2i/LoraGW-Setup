@@ -81,7 +81,7 @@ selectN() {
 }
 
 echo "Updating dependencies"
-apt-get update && sudo apt-get upgrade && sudo apt-get update
+apt-get update && apt-get upgrade -y --force-yes && apt-get update
 apt-get install -y --force-yes git-core build-essential ntp scons i2c-tools
 
 echo "Updating python dependencies"
