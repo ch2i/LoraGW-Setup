@@ -86,8 +86,8 @@ This [1_Pi_Config.sh](https://github.com/ch2i/LoraGW-Setup/blob/master/1_Pi_Conf
 It also enable excellent [log2ram](https://github.com/azlux/log2ram) SD card preservation.
 
 ```shell
-wget https://raw.githubusercontent.com/ch2i/LoraGW-Setup/master/1_Pi_Config.sh
-chmod ug+x 1_Pi_Config.sh && sudo ./1_Pi_Config.sh
+wget https://raw.githubusercontent.com/ch2i/LoraGW-Setup/master/1_Pi_Config.sh && chmod ug+x 1_Pi_Config.sh
+sudo ./1_Pi_Config.sh
 ``` 
 
 
