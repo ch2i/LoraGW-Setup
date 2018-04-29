@@ -96,7 +96,7 @@ def check_inet(delay):
 
     # Check WiFi AP mode and packet forwarder
     hostapd = check_process("hostapd")
-    pktfwd = check_process("mp_pkt_fwd")
+    pktfwd = check_process("mp_pkt_fwd") or check_process("poly_pkt_fwd")
 
     time.sleep(delay)
 
