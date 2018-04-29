@@ -161,7 +161,7 @@ def stats():
       draw.text((col1, line2), "MEM FREE: %s/%s" % (bytes2human(mem.available), bytes2human(mem.total)), font=font10, fill=255)
       draw.text((col1, line3), "DSK FREE: %s/%s" % (bytes2human(dsk.total-dsk.used), bytes2human(dsk.total)),font=font10, fill=255)
       draw.text((col1, line4), "CPU TEMP: %sc" % (str(tempC/1000)), font=font10, fill=255)
-      draw.text((col1, line4), "UP : %s" % uptime(), font=font10, fill=255)
+      draw.text((col1, line5), "UP : %s" % uptime(), font=font10, fill=255)
       looper=0
     else:
       #draw.text((col1, line1),"%s %s" % (platform.system(),platform.release()), font=font10, fill=255)
