@@ -114,13 +114,13 @@ def uptime():
   # Build up the pretty string (like this: "N days, N hours, N minutes, N seconds")
   string = ""
   if days > 0:
-    string += str(days) + " " + (days == 1 and "day" or "days" ) + ", "
+    string += str(days) + "d "
   if len(string) > 0 or hours > 0:
-    string += str(hours) + " " + (hours == 1 and "hour" or "hours" ) + ", "
+    string += str(hours) + "h "
   if len(string) > 0 or minutes > 0:
-    string += str(minutes) + " " + (minutes == 1 and "min" or "mins" ) + ", "
-  if hours == 0:
-    string += str(seconds) + " " + (seconds == 1 and "sec" or "secs" )
+    string += str(minutes) + "m "
+  if hours == 0 and seconds >0:
+    string += str(seconds) + "s" 
 
   return string;
 
@@ -148,8 +148,8 @@ def stats():
       draw.text((col1, line1),"Host :%s" % socket.gethostname(), font=font10, fill=255)
       draw.text((col1, line2), lan_ip("wlan0"),  font=font10, fill=255)
       draw.text((col1, line3), network("wlan0"),  font=font10, fill=255)
-      #draw.text((col1, line4), lan_ip("uap0"),  font=font10, fill=255)
-      #draw.text((col1, line5), network("uap0"),  font=font10, fill=255)
+      #draw.text((col1, line4), lan_ip("ap0"),  font=font10, fill=255)
+      #draw.text((col1, line5), network("ap0"),  font=font10, fill=255)
       looper=2
     elif looper==2:
       tempC = int(open('/sys/class/thermal/thermal_zone0/temp').read())
