@@ -88,7 +88,7 @@ selectN() {
 
 echo ""
 echo "Target board/shield for this $MODEL:"
-selectN "CH2i RAK831 Minimal" "CH2i RAK831 with WS2812B Led" "CH2i ic880a" "All other models"
+selectN "CH2i RAK831 Minimal" "CH2i RAK831 with WS2812B Led" "CH2i ic880a" "RAK831 official shield" "All other models"
 BOARD_TARGET=$?
 if [[ $BOARD_TARGET == 1 ]]; then
   GW_RESET_PIN=25
@@ -105,7 +105,12 @@ if [[ $BOARD_TARGET == 3 ]]; then
   MONITOR_SCRIPT=monitor-gpio.py
   export GW_RESET_PIN
 fi
-echo "Monitor script is $MONITOR_SCRIPT, reset pin is $GW_RESET_PIN"
+if [[ $BOARD_TARGET == 4 ]]; then
+  GW_RESET_PIN=17
+  export GW_RESET_PIN
+fi
+echo "Monitor script is $MONITOR_SCRIPT"
+echo "GW Reset pin is GPIO$GW_RESET_PIN"
 
 echo ""
 echo -n "Do you want to build Kersing packet forwarder [Y/n] "
@@ -118,9 +123,10 @@ echo -n "Would you like to enable this [Y/n] "
 read EN_MONITOR
 
 echo ""
+echo "If you a OLED display, You can enable OLED service that"
+echo "display some system information and LoRaWAN packet info"
 echo -n "Do you want to install I2C OLED [y/N] "
 read EN_OLED
-
 
 echo ""
 echo -n "Do you want to setup TTN [Y/n] "
@@ -344,7 +350,9 @@ cd /home/loragw/LoraGW-Setup
 cp ./oled.py $INSTALL_DIR/
 cp ./monitor-ws2812.py  $INSTALL_DIR/
 cp ./monitor-gpio.py  $INSTALL_DIR/
-ln -s $INSTALL_DIR/$MONITOR_SCRIPT  $INSTALL_DIR/monitor.py
+if [[ $MONITOR_SCRIPT != "" ]]; then
+  ln -s $INSTALL_DIR/$MONITOR_SCRIPT  $INSTALL_DIR/monitor.py
+fi
 cp ./monitor.service /lib/systemd/system/
 cp ./oled.service /lib/systemd/system/
 cp start.sh  $INSTALL_DIR/
