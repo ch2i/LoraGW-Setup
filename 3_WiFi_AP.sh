@@ -92,6 +92,8 @@ echo "Setting up WiFi access point with"
 echo "SSID : $SSID"
 echo "PSK  : $PSK"
 
+sudo apt-get install -y hostapd dnsmasq 
+
 # Set the SSID/PSK 
 echo "Replacing SSID / PASK in hostapd.conf"
 replace ./config/hostapd.conf "^.*_AP_SSID_.*$" "ssid=$SSID"
