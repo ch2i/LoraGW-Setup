@@ -115,7 +115,7 @@ if [[ "$REPLY" =~ ^(yes|y|Y)$ ]]; then
 	dpkg-reconfigure tzdata
 fi
 
-if [[ ! -f /usr/local/bin/ram2disk ]]; then
+if [[ ! -f /usr/local/bin/log2ram ]]; then
 	echo -n "Do you want to enable log2ram [y/N] "
 	read
 	if [[ "$REPLY" =~ ^(yes|y|Y)$ ]]; then
@@ -124,7 +124,18 @@ if [[ ! -f /usr/local/bin/ram2disk ]]; then
 		cd log2ram
 		chmod +x install.sh uninstall.sh
 		./install.sh
-		ln -s /usr/local/bin/ram2disk /etc/cron.hourly/
+		ln -s /usr/local/bin/log2ram /etc/cron.hourly/
+		echo "cleaning up log rotation"
+		replace /etc/logrotage.d/rsyslog "^.*daily.*$" "    hourly"
+		replace /etc/logrotage.d/rsyslog "^.*monthly.*$" "    daily"
+		replace /etc/logrotage.d/rsyslog "^.*delaycompress.*$" "  "
+
+		echo "forcing one log rotation"
+		logrotate /etc/logrotate.conf
+		echo "Please don't forget to adjust the logrotate"
+		echo "paratemeters in /etc/logrotage.d/* to avoid"
+		echo "filling up the ramdisk, see README in"
+		echo "https://github.com/ch2i/LoraGW-Setup/"
 		echo ""
 	fi
 fi

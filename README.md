@@ -293,6 +293,59 @@ sudo systemctl stop loragw
 sudo systemctl start loragw
 ```
 
+## Adjust log2ram
+
+if you chose log2ram to reduce SD card write, you need to change some log file rotation to avoid RAM Disk to be full.
+
+For this you need to edit each file in `/etc/logrotate.d/`, and on each file:
+
+- remove line(s) containing `delaycompress` (this avoid uncompressed old log)
+- change line(s) containing `rotate n` by rotate 12 (this this the max log file history)
+- change line(s) containing `daily` by `hourly` (rotate log each hour)
+- change line(s) containing `monthly` by `daily` (rotate log each day)
+
+In this case we got last 12H with 1 file per hour. Of course, you can adjust these paramaters to feet you need, it's just an example, 
+
+file `/etc/logrotate.d/rsyslog`
+
+```
+/var/log/syslog
+{
+        rotate 12
+        hourly
+        missingok
+        notifempty
+        compress
+        postrotate
+        invoke-rc.d rsyslog rotate > /dev/null
+        endscript
+}
+
+/var/log/mail.info
+/var/log/mail.warn
+/var/log/mail.err
+/var/log/mail.log
+/var/log/daemon.log
+/var/log/kern.log
+/var/log/auth.log
+/var/log/user.log
+/var/log/lpr.log
+/var/log/cron.log
+/var/log/debug
+/var/log/messages
+{
+        rotate 12
+        hourly
+        missingok
+        notifempty
+        compress
+        sharedscripts
+        postrotate
+        invoke-rc.d rsyslog rotate > /dev/null
+        endscript
+}
+
+``` 
 
 # And here is the final result
 
