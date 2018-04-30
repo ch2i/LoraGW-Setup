@@ -93,9 +93,11 @@ echo "SSID : $SSID"
 echo "PSK  : $PSK"
 
 # Set the SSID/PSK 
+echo "Replacing SSID / PASK in hostapd.conf"
 replace ./config/hostapd.conf "^.*_AP_SSID_.*$" "ssid=$SSID"
-replace ./config/hostapd.conf "^.*_AP_PASSWORD_.*$" "ssid=$PSK"
-if [[ $CCODE == "" ]]; then
+replace ./config/hostapd.conf "^.*_AP_PASSWORD_.*$" "wpa_passphrase=$PSK"
+if [[ $CCODE != "" ]]; then
+  echo "Setting default country code to $CCCODE in hostapd.conf"
   replace ./config/hostapd.conf "^.*country_code=.*$" "country_code=$CCODE"
 fi
 
@@ -105,7 +107,8 @@ cp ./config/hostapd.conf /etc/hostapd/
 cp ./config/dnsmasq.conf /etc/
 cp ./config/interfaces /etc/network/
 
-replace /etc/default/hostapd "^.*DAEMON_CONF=.*$" "DAEMON_CONF='/etc/hostapd/hostapd.conf'"
+echo "Setting default hostapd config file"
+append1 /etc/default/hostapd "^.*DAEMON_CONF=.*$" "DAEMON_CONF=\"/etc/hostapd/hostapd.conf\""
 
 # disable dhcpcd service
 update-rc.d dhcpcd disable
@@ -117,7 +120,7 @@ echo "Done."
 echo
 echo "Settings take effect on next boot."
 echo "after reboot, login back here with"
-echo "ssh loragw@$NEWHOST.local"
+echo "ssh loragw@$HOSTNAME.local"
 echo
 echo -n "REBOOT NOW? [y/N] "
 read
