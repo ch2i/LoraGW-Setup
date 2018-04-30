@@ -1,0 +1,18 @@
+# Include files from /etc/network/interfaces.d:
+source-directory /etc/network/interfaces.d
+
+auto lo
+auto ap0
+auto wlan0
+iface lo inet loopback
+
+allow-hotplug wlan0
+iface wlan0 inet manual
+    wpa-roam /etc/wpa_supplicant/wpa_supplicant.conf
+iface wlan0 inet dhcp
+
+allow-hotplug ap0
+iface ap0 inet static
+    address 192.168.50.1
+    netmask 255.255.255.0
+    hostapd /etc/hostapd/hostapd.conf
