@@ -68,7 +68,7 @@ class MyUDPHandler(SocketServer.BaseRequestHandler):
             lora_datr = js_data["datr"]
         # for poly_pkt_fwd
         elif js_data.get('rxpk'):
-            lora_mote = "------"
+            lora_mote = "legacy_fwd"
             lora_rssi = js_data["rxpk"][0]["rssi"]
             lora_chan = js_data["rxpk"][0]["chan"]
             lora_freq = js_data["rxpk"][0]["freq"]
