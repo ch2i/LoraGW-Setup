@@ -25,20 +25,54 @@ line3=line2+12
 line4=line3+12
 line5=line4+12
 col1=0
+lora_rssi = None
+lora_chan = None
+lora_freq = None
+lora_datr = None
+lora_mote = None
 
 class MyUDPHandler(SocketServer.BaseRequestHandler):
 
-  def handle(self):
-    global json_data
-    data = self.request[0]
-    #print(data)
-    #data = data[12::]
-    #print("\r\n")
-    print(data)
-    js_data = json.loads(data)
+  def is_json(self, myjson):
+    try:
+      json_object = json.loads(myjson)
+    except ValueError, e:
+      return False
+    return True
 
-    if js_data.get('type')=='uplink':
-      json_data = data
+  def handle(self):
+    json_data
+    global lora_rssi
+    global lora_chan
+    global lora_freq
+    global lora_datr
+    global lora_mote
+
+    data = self.request[0]
+    # for poly_pkt_fwd remove 12 first bytes
+    # if mp_pkt_fwd then packet are already fine
+    if data.find("{\"rxpk\":[") > 0:
+    	data = data[12::]
+
+    if self.is_json(data):
+        #print("\r\n")
+        #print(data)
+        js_data = json.loads(data)
+
+        # for mp_pkt_fwd
+        if js_data.get('type')=='uplink':
+            lora_mote = js_data["mote"]
+            lora_rssi = js_data["rssi"]
+            lora_chan = js_data["chan"]
+            lora_freq = js_data["freq"]
+            lora_datr = js_data["datr"]
+        # for poly_pkt_fwd
+        elif js_data.get('rxpk'):
+            lora_mote = "------"
+            lora_rssi = js_data["rxpk"][0]["rssi"]
+            lora_chan = js_data["rxpk"][0]["chan"]
+            lora_freq = js_data["rxpk"][0]["freq"]
+            lora_datr = js_data["rxpk"][0]["datr"]
 
 def do_nothing(obj):
   pass
@@ -129,17 +163,12 @@ def stats():
   with canvas(device) as draw:
     #draw.rectangle((0,0,127,63), outline="white", fill="black")
     if looper==0:
-      if json_data!=None:
-        try:
-          o = json.loads(json_data)
-          draw.text((col1, line1),"Mote %s" % (o["mote"]), font=font10, fill=255)
-          draw.text((col1, line2),"RSSI %sdBi" % ( o["rssi"]), font=font10, fill=255)
-          draw.text((col1, line3),"Chan %s" % (o["chan"]), font=font10, fill=255)
-          draw.text((col1, line4),"Freq %.2f MHz" % (o["freq"]), font=font10, fill=255)
-          draw.text((col1, line5),"Rate %s" % (o["datr"]), font=font10, fill=255)
-        except:
-          draw.text((col1, line1),"Invalid JSON received", font=font10, fill=255)
-          pass
+      if lora_mote != None:
+          draw.text((col1, line1),"Mote %s" % lora_mote, font=font10, fill=255)
+          draw.text((col1, line2),"RSSI %sdBi" % lora_rssi, font=font10, fill=255)
+          draw.text((col1, line3),"Chan %s" % lora_chan, font=font10, fill=255)
+          draw.text((col1, line4),"Freq %.2f MHz" % lora_freq, font=font10, fill=255)
+          draw.text((col1, line5),"Rate %s" % lora_datr, font=font10, fill=255)
       else:
         draw.text((col1, line1),"No LoRaWAN Data yet", font=font10, fill=255)
 
