@@ -68,7 +68,7 @@ class MyUDPHandler(SocketServer.BaseRequestHandler):
             lora_datr = js_data["datr"]
         # for poly_pkt_fwd
         elif js_data.get('rxpk'):
-            lora_mote = "legacy_fwd"
+            lora_mote = "------"
             lora_rssi = js_data["rxpk"][0]["rssi"]
             lora_chan = js_data["rxpk"][0]["chan"]
             lora_freq = js_data["rxpk"][0]["freq"]
@@ -111,18 +111,24 @@ def bytes2human(n):
       return '%s%s' % (value, s)
   return "%sB" % n
 
-def network(iface):
-  stat = psutil.net_io_counters(pernic=True)[iface]
-  return "Tx %s   Rx %s" % (bytes2human(stat.bytes_sent), bytes2human(stat.bytes_recv))
+def if_stat(iface):
+  try:
+    stat = psutil.net_io_counters(pernic=True)[iface]
+    return "Tx %s   Rx %s" % (bytes2human(stat.bytes_sent), bytes2human(stat.bytes_recv))
 
-def lan_ip(iface):
-  for nic, addrs in psutil.net_if_addrs().items():
-    if nic == iface:
-      for addr in addrs:
-        if addr.family==socket.AF_INET:
-          return "%-5s: %s" % (iface, addr.address)
+  except KeyError as e:
+    return "Tx %s   Rx %s" % (bytes2human(0), bytes2human(0))
 
-  return "%-5s: Unknown IP" % iface
+
+def lan_info(iface):
+  try:
+    for snic in psutil.net_if_addrs()[iface]:
+      if snic.family == socket.AF_INET:
+        #print snic.address
+        return "%-5s: %s" % (iface, snic.address), if_stat(iface)
+
+  except KeyError as e:
+    return None, None
 
 def uptime():
   try:
@@ -175,10 +181,19 @@ def stats():
       looper=1
     elif looper==1:
       draw.text((col1, line1),"Host :%s" % socket.gethostname(), font=font10, fill=255)
-      draw.text((col1, line2), lan_ip("wlan0"),  font=font10, fill=255)
-      draw.text((col1, line3), network("wlan0"),  font=font10, fill=255)
-      #draw.text((col1, line4), lan_ip("ap0"),  font=font10, fill=255)
-      #draw.text((col1, line5), network("ap0"),  font=font10, fill=255)
+      # Try to get wlan0 if not then eth0
+      ip, stats = lan_info("wlan0")
+      if  ip == None:
+        ip, stats = lan_info("eth0")
+      if ip != None:
+      	draw.text((col1, line2), ip,  font=font10, fill=255)
+      	draw.text((col1, line3), stats,  font=font10, fill=255)
+
+      ip, stats = lan_info("ap0")
+      if ip != None:
+        draw.text((col1, line4), ip,  font=font10, fill=255)
+        draw.text((col1, line5), stats,  font=font10, fill=255)
+
       looper=2
     elif looper==2:
       tempC = int(open('/sys/class/thermal/thermal_zone0/temp').read())
