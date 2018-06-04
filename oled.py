@@ -31,6 +31,27 @@ lora_freq = None
 lora_datr = None
 lora_mote = None
 
+class LeaseEntry:
+  def __init__(self, leasetime, macAddress, ipAddress, name):
+    if (leasetime == '0'):
+      self.staticIP = True
+    else:
+      self.staticIP = False
+    self.leasetime = datetime.fromtimestamp(int(leasetime)).strftime('%Y-%m-%d %H:%M:%S')
+    self.macAddress = macAddress.upper()
+    self.ipAddress = ipAddress
+    self.name = name
+
+  def serialize(self):
+    return {
+      'staticIP': self.staticIP,
+      'leasetime': self.leasetime,
+      'macAddress': self.macAddress,
+      'ipAddress': self.ipAddress,
+      'name': self.name
+    }
+
+
 class MyUDPHandler(SocketServer.BaseRequestHandler):
 
   def is_json(self, myjson):
@@ -52,7 +73,7 @@ class MyUDPHandler(SocketServer.BaseRequestHandler):
     # for poly_pkt_fwd remove 12 first bytes
     # if mp_pkt_fwd then packet are already fine
     if data.find("{\"rxpk\":[") > 0:
-    	data = data[12::]
+      data = data[12::]
 
     if self.is_json(data):
         #print("\r\n")
@@ -68,11 +89,38 @@ class MyUDPHandler(SocketServer.BaseRequestHandler):
             lora_datr = js_data["datr"]
         # for poly_pkt_fwd
         elif js_data.get('rxpk'):
-            lora_mote = "------"
+            lora_mote = "legacy_fwd"
             lora_rssi = js_data["rxpk"][0]["rssi"]
             lora_chan = js_data["rxpk"][0]["chan"]
             lora_freq = js_data["rxpk"][0]["freq"]
             lora_datr = js_data["rxpk"][0]["datr"]
+            
+def leaseSort(arg):
+  # Fixed IPs first
+  if arg.staticIP == True:
+    return 0
+  else:
+    return arg.name.lower()
+
+def getLeases():
+  leases = list()
+  try:
+    with open("/var/lib/misc/dnsmasq.leases") as f:
+      for line in f:
+        elements = line.split()
+        if len(elements) == 5:
+          entry = LeaseEntry(elements[0],elements[1],elements[2],elements[3])
+          leases.append(entry)
+
+    leases.sort(key = leaseSort)
+    return [lease.serialize() for lease in leases]
+
+  except Exception as e:
+    print "error in getLeases"
+    print(e)
+    print(type(e))            
+    return None
+            
 
 def do_nothing(obj):
   pass
@@ -119,7 +167,6 @@ def if_stat(iface):
   except KeyError as e:
     return "Tx %s   Rx %s" % (bytes2human(0), bytes2human(0))
 
-
 def lan_info(iface):
   try:
     for snic in psutil.net_if_addrs()[iface]:
@@ -164,11 +211,17 @@ def uptime():
 
   return string;
 
+def ip_client(thislease):
+  ips = thislease["ipAddress"].split('.')
+  return "%s.%s: %s" % (ips[2],ips[3], thislease["name"])
+
 def stats():
   global looper
+  lease = None
   with canvas(device) as draw:
     #draw.rectangle((0,0,127,63), outline="white", fill="black")
     if looper==0:
+      looper=1
       if lora_mote != None:
           draw.text((col1, line1),"Mote %s" % lora_mote, font=font10, fill=255)
           draw.text((col1, line2),"RSSI %sdBi" % lora_rssi, font=font10, fill=255)
@@ -178,24 +231,38 @@ def stats():
       else:
         draw.text((col1, line1),"No LoRaWAN Data yet", font=font10, fill=255)
 
-      looper=1
     elif looper==1:
+      looper = 2
       draw.text((col1, line1),"Host :%s" % socket.gethostname(), font=font10, fill=255)
       # Try to get wlan0 if not then eth0
       ip, stats = lan_info("wlan0")
       if  ip == None:
         ip, stats = lan_info("eth0")
       if ip != None:
-      	draw.text((col1, line2), ip,  font=font10, fill=255)
-      	draw.text((col1, line3), stats,  font=font10, fill=255)
+        draw.text((col1, line2), ip,  font=font10, fill=255)
+        draw.text((col1, line3), stats,  font=font10, fill=255)
 
       ip, stats = lan_info("ap0")
       if ip != None:
         draw.text((col1, line4), ip,  font=font10, fill=255)
         draw.text((col1, line5), stats,  font=font10, fill=255)
+        lease = getLeases()
 
-      looper=2
+      if lease == None:
+        looper = 3 
     elif looper==2:
+      looper = 3 
+      lease = getLeases()
+      lg = len(lease)
+
+      draw.text((col1, line1), "Wifi Clients => %d" % lg, font=font10, fill=255)
+      if lg>=1: draw.text((col1, line2), ip_client(lease[0]), font=font10, fill=255)
+      if lg>=2: draw.text((col1, line3), ip_client(lease[1]), font=font10, fill=255)
+      if lg>=3: draw.text((col1, line4), ip_client(lease[2]), font=font10, fill=255)
+      if lg>=4: draw.text((col1, line5), ip_client(lease[3]), font=font10, fill=255)
+
+    elif looper==3:
+      looper = 0
       tempC = int(open('/sys/class/thermal/thermal_zone0/temp').read())
       av1, av2, av3 = os.getloadavg()
       mem = psutil.virtual_memory()
@@ -206,7 +273,7 @@ def stats():
       draw.text((col1, line3), "DSK FREE: %s/%s" % (bytes2human(dsk.total-dsk.used), bytes2human(dsk.total)),font=font10, fill=255)
       draw.text((col1, line4), "CPU TEMP: %sc" % (str(tempC/1000)), font=font10, fill=255)
       draw.text((col1, line5), "UP : %s" % uptime(), font=font10, fill=255)
-      looper=0
+
     else:
       #draw.text((col1, line1),"%s %s" % (platform.system(),platform.release()), font=font10, fill=255)
       #uptime = datetime.now() - datetime.fromtimestamp(psutil.boot_time())
