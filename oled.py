@@ -168,14 +168,22 @@ def if_stat(iface):
     return "Tx %s   Rx %s" % (bytes2human(0), bytes2human(0))
 
 def lan_info(iface):
+  ip = "No Interface"
+  stat = ""
   try:
     for snic in psutil.net_if_addrs()[iface]:
       if snic.family == socket.AF_INET:
-        #print snic.address
-        return "%-5s: %s" % (iface, snic.address), if_stat(iface)
+        ip = snic.address
+        stat = if_stat(iface)
+        break
+      else:
+        ip ="No IP"
+
+    return "%-5s: %s" % (iface, ip), stat
 
   except KeyError as e:
-    return None, None
+    return ip, stat
+
 
 def uptime():
   try:
@@ -235,18 +243,21 @@ def stats():
       looper = 2
       draw.text((col1, line1),"Host :%s" % socket.gethostname(), font=font10, fill=255)
       # Try to get wlan0 if not then eth0
-      ip, stats = lan_info("wlan0")
-      if  ip == None:
-        ip, stats = lan_info("eth0")
-      if ip != None:
-        draw.text((col1, line2), ip,  font=font10, fill=255)
-        draw.text((col1, line3), stats,  font=font10, fill=255)
+      ip, stats = lan_info("eth0")
+      if ip == "No Interface":
+        ip, stats = lan_info("wlan0")
+        
+      draw.text((col1, line2), ip,  font=font10, fill=255)
+      draw.text((col1, line3), stats,  font=font10, fill=255)
 
       ip, stats = lan_info("ap0")
-      if ip != None:
+      if ip != "No IP" and ip != "No Interface":
         draw.text((col1, line4), ip,  font=font10, fill=255)
         draw.text((col1, line5), stats,  font=font10, fill=255)
         lease = getLeases()
+      else:
+        draw.text((col1, line4), "ap0",  font=font10, fill=255)
+        draw.text((col1, line5), "No Access Point",  font=font10, fill=255)
 
       if lease == None:
         looper = 3 
