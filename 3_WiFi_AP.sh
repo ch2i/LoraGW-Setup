@@ -17,6 +17,22 @@ echo "hostapd, dnsmasq and configure SSID / Password"
 echo
 echo "Device is $MODEL"
 echo
+
+if echo "$MODEL" | grep -q "Zero"; then
+    echo "Device Match configuration OK";
+else
+    echo "This model is not supported, this"
+    echo "script runs only on Pi Zero else"
+    echo "it will break your network config"
+    echo "You'll loose network on reboot and"
+    echo "potentially access to your device"
+    echo ""
+    echo "!!! you've been warned !!!"
+    echo "exiting immediatly to avoid this"
+    exit 0
+fi
+
+
 echo "Run time ~1 minute. Reboot required."
 echo
 echo -n "CONTINUE? [Y/n] "
