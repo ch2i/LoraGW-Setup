@@ -381,6 +381,10 @@ if [[ "$BUILD_LEGACY" =~ ^(yes|y|Y)$ ]]; then
       git reset --hard
   fi
   make
+
+  # Copy legacy forwarder where it'll be expected
+  cp ./poly_pkt_fwd/poly_pkt_fwd $INSTALL_DIR/poly_pkt_fwd
+
   popd
 
   if [ ! -f $INSTALL_DIR/poly_pkt_fwd ]; then
