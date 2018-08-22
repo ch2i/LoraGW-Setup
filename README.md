@@ -86,7 +86,8 @@ This [1_Pi_Config.sh](https://github.com/ch2i/LoraGW-Setup/blob/master/1_Pi_Conf
 It also enable excellent [log2ram](https://github.com/azlux/log2ram) SD card preservation.
 
 ```shell
-wget https://raw.githubusercontent.com/ch2i/LoraGW-Setup/master/1_Pi_Config.sh && chmod ug+x 1_Pi_Config.sh
+wget https://raw.githubusercontent.com/ch2i/LoraGW-Setup/master/1_Pi_Config.sh
+chmod ug+x 1_Pi_Config.sh
 sudo ./1_Pi_Config.sh
 ``` 
 
@@ -101,7 +102,8 @@ ssh loragw@loragw-xxyy.local
 
 ### Get CH2i Gateway Install repository
 ``` 
-git clone https://github.com/ch2i/LoraGW-Setup && cd LoraGW-Setup
+git clone https://github.com/ch2i/LoraGW-Setup
+cd LoraGW-Setup
 ```
 
 ## Configure Gateway on TTN console
@@ -186,6 +188,25 @@ You can also select which GPIO LED is used to replace activity LED if you need i
 dtoverlay=pi3-act-led,gpio=23
 ```
 The Red LED (gpio23) will blink on activity.
+
+### Shutdown or Activity LED (for RPI Zero Shield V1.5+)
+
+If you have a raspberry PI Zero with this RAK831, then you can change the `/boot/config.txt` file to choose one of the two following features:
+
+```
+# When system is Halted/OFF Light Green LED
+dtoverlay=gpio-poweroff,gpiopin=26
+```
+The Green LED (gpio26) will stay on when you can remove the power of the gateway. It's really a great indicator.
+
+You can also choose select this LED to replace activity LED if you need it.
+```
+# Activity LED
+dtparam=act_led_gpio=26
+```
+The Greend LED (gpio26) will blink on activity.
+
+You can select only one of the 2 options, not both at the same time.
 
 ## Detailled information
 
