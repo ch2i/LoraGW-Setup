@@ -103,10 +103,11 @@ if [[ $CCODE != "" ]]; then
   replace ./config/hostapd.conf "^.*country_code=.*$" "country_code=$CCODE"
 fi
 
-# Copy configuration files
+# Copy configuration files (save orgininal files)
 cp ./config/90-wireless.rules /etc/udev/rules.d/
 cp ./config/hostapd.conf /etc/hostapd/
 cp ./config/dnsmasq.conf /etc/
+cp /etc/network/interfaces /etc/network/interfaces.old
 cp ./config/interfaces /etc/network/
 
 echo "Setting default hostapd config file"
@@ -115,7 +116,8 @@ append1 /etc/default/hostapd "^.*DAEMON_CONF=.*$" "DAEMON_CONF=\"/etc/hostapd/ho
 # disable dhcpcd service
 update-rc.d dhcpcd disable
 
-# Fix bootup 
+# Fix bootup (save orgininal file)
+cp /etc/rc.local /etc/rc.local.old
 cp ./config/rc.local /etc/
 
 echo "Done."
