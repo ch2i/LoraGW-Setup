@@ -1,0 +1,16 @@
+{
+    "dnsmasq_cfg": {
+	"address": "/#/192.168.50.1",
+	"dhcp_range": "192.168.50.50,192.168.50.100,1h",
+	"vendor_class": "set:device,IoT"
+    },
+    "host_apd_cfg": {
+	"ip": "192.168.50.1",
+	"ssid": "_AP_SSID_",
+	"wpa_passphrase":"_AP_PASSWORD_",
+	"channel": "6"
+    },
+    "wpa_supplicant_cfg": {
+	"cfg_file": "/etc/wpa_supplicant/wpa_supplicant.conf"
+    }
+}
