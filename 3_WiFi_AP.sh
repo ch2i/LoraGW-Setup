@@ -10,7 +10,7 @@ if [ $(id -u) -ne 0 ]; then
 fi
 
 echo "This script configures a Raspberry Pi"
-echo "as a wifi access pointonnected to TTN,"
+echo "as a wifi access point and client"
 echo
 echo "It will install the following dependencies"
 echo "hostapd, dnsmasq and configure SSID / Password"
@@ -29,6 +29,13 @@ else
     echo ""
     echo "!!! you've been warned !!!"
     echo "exiting immediatly to avoid this"
+    echo "for this PI model use docker mode"
+    echo "and follow procedure located here"
+    echo "https://github.com/cjimti/iotwifi"
+    echo "to install docker then run script"
+    echo "4_WiFi_Docker.sh of this folder"
+
+
     exit 0
 fi
 
