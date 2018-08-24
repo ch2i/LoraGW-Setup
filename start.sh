@@ -1,5 +1,11 @@
 #! /bin/bash
 
+# Test the connection, wait if needed.
+#while [[ $(ping -c1 google.com 2>&1 | grep " 0% packet loss") == "" ]]; do
+#  echo "[Lora Gateway]: Waiting for internet connection..."
+#  sleep 2
+#  done
+
 # Reset RAK831 PIN
 SX1301_RESET_BCM_PIN=25
 
