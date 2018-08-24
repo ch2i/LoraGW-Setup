@@ -88,7 +88,7 @@ selectN() {
 
 echo ""
 echo "Target board/shield for this $MODEL:"
-selectN "CH2i RAK831 Minimal" "CH2i RAK831 with WS2812B Led" "CH2i ic880a" "RAK831 official shield" "All other models"
+selectN "CH2i RAK831 Minimal" "CH2i RAK831 with WS2812B Led" "CH2i ic880a" "IMST Lora Lite (ic880a)" "RAK831 official shield" "All other models"
 BOARD_TARGET=$?
 if [[ $BOARD_TARGET == 1 ]]; then
   GW_RESET_PIN=25
@@ -101,15 +101,24 @@ if [[ $BOARD_TARGET == 2 ]]; then
   export GW_RESET_PIN
 fi
 if [[ $BOARD_TARGET == 3 ]]; then
-  GW_RESET_PIN=17
-  MONITOR_SCRIPT=monitor-gpio.py
+  GW_RESET_PIN=5
   export GW_RESET_PIN
 fi
 if [[ $BOARD_TARGET == 4 ]]; then
   GW_RESET_PIN=17
+  MONITOR_SCRIPT=monitor-gpio.py
   export GW_RESET_PIN
 fi
-echo "Monitor script is $MONITOR_SCRIPT"
+if [[ $BOARD_TARGET == 5 ]]; then
+  GW_RESET_PIN=17
+  export GW_RESET_PIN
+fi
+
+if [[ $MONITOR_SCRIPT == "" ]]; then
+  echo "No monitoring script"
+else
+  echo "Monitor script is $MONITOR_SCRIPT"
+fi
 echo "GW Reset pin is GPIO$GW_RESET_PIN"
 
 echo ""
