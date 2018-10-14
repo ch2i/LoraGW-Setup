@@ -232,7 +232,7 @@ def stats():
       looper=1
       if lora_mote != None:
           draw.text((col1, line1),"Mote %s" % lora_mote, font=font10, fill=255)
-          draw.text((col1, line2),"RSSI %sdBi" % lora_rssi, font=font10, fill=255)
+          draw.text((col1, line2),"RSSI %sdBm" % lora_rssi, font=font10, fill=255)
           draw.text((col1, line3),"Chan %s" % lora_chan, font=font10, fill=255)
           draw.text((col1, line4),"Freq %.2f MHz" % lora_freq, font=font10, fill=255)
           draw.text((col1, line5),"Rate %s" % lora_datr, font=font10, fill=255)
