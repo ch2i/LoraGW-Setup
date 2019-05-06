@@ -135,7 +135,7 @@ def checkShutdown():
                   GPIO.output(gpio_grn, GPIO.LOW)
                   time.sleep(.4)
             print "shutdown"
-            #os.system("sudo halt &")
+            os.system("sudo halt &")
             time.sleep(30)
 
 signal.signal(signal.SIGINT, signal_handler)
