@@ -100,11 +100,11 @@ if [[ $BOARD_TARGET == 2 ]]; then
   MONITOR_SCRIPT=monitor-ws2812.py
   export GW_RESET_PIN
 fi
-if [[ $BOARD_TARGET == 3 ]]; then
+if [[ $BOARD_TARGET == 4 ]]; then
   GW_RESET_PIN=5
   export GW_RESET_PIN
 fi
-if [[ $BOARD_TARGET == 4 ]]; then
+if [[ $BOARD_TARGET == 3 ]]; then
   GW_RESET_PIN=17
   MONITOR_SCRIPT=monitor-gpio.py
   export GW_RESET_PIN
