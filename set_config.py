@@ -92,7 +92,8 @@ if(os.getenv('SERVER_TTN', "true")=="true"):
   if "router" in ttn_config:
     router = ttn_config['router'].get('mqtt_address', "mqtt://router.dev.thethings.network:1883")
     router = urlparse.urlparse(router)
-    router = router.hostname # mp_pkt_fwd only wants the hostname, not the protocol and port
+    #router = router.hostname # mp_pkt_fwd only wants the hostname, not the protocol and port
+    router = router.path # mp_pkt_fwd only wants the hostname, not the protocol and port
   else:
     router = "router.dev.thethings.network"
 
