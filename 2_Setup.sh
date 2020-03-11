@@ -187,8 +187,8 @@ replace ./start.sh "^.*RESET_BCM_PIN=.*$" "SX1301_RESET_BCM_PIN=$GW_RESET_PIN"
 
 grep "Pi\ 3" /proc/device-tree/model >/dev/null
 if [ $? -eq 0 ]; then
-	echo "Installing nodejs v8 for Raspberry PI 3"
-	curl -sL https://deb.nodesource.com/setup_8.x | sudo -E bash -
+	echo "Installing nodejs v10 for Raspberry PI 3"
+	curl -sL https://deb.nodesource.com/setup_10.x | sudo -E bash -
 	apt-get install nodejs
 
   # iC880a and RPI 3 Setup Activity LED and Power OFF Led 
